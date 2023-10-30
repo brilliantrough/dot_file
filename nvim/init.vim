@@ -1,5 +1,5 @@
 "True Color
-set t_Co=256 
+set t_Co=256
 if has("termguicolors")
     " fix bug for vim
     set t_8f=[38;2;%lu;%lu;%lum " ^[ is ^v+<ESC>
@@ -18,17 +18,16 @@ syntax on
 
 set fileencodings=utf-8,gbk
 set shortmess+=I " Disable the default Vim startup message.
-set showcmd		" Show (partial) command in status line.
-set showmatch		" Show matching brackets.	
+set showcmd        " Show (partial) command in status line.
+set showmatch        " Show matching brackets.
 set hlsearch "high light search, annoying
-set autowrite		" Automatically save before commands like :next and :make
+set autowrite        " Automatically save before commands like :next and :make
 set hidden " Hide buffers when they are abandoned
 set ignorecase " Do case insensitive matching
 set smartcase " Do smart case matching
 set incsearch " Incremental search
 setlocal noswapfile " 不要生成swap文件
 set bufhidden=hide " 当buffer被丢弃的时候隐藏它
-" colorscheme molokai" 设定配色方案
 
 set number " Show line numbers.
 set relativenumber
@@ -44,7 +43,7 @@ set nobackup " 覆盖文件时不备份
 set autochdir " 自动切换当前目录为当前文件所在的目录
 set backupcopy=yes " 设置备份时的行为为覆盖
 "Disable audible bell because it's annoying.
-set noerrorbells visualbell t_vb= 
+set noerrorbells visualbell t_vb=
 set noerrorbells " 关闭错误信息响铃
 set novisualbell " 关闭使用可视响铃代替呼叫
 set t_vb= " 置空错误铃声的终端代码
@@ -67,8 +66,8 @@ hi CocMenuSel ctermbg=109 guibg=#13354A " 设置Coc颜色
 setlocal foldlevel=1 " 设置折叠层数为 1
 set fen " fold enable, = set foldenable
 set nofen " do not fold anything, = set nofoldenable
-autocmd FileType * exe "normal zR"
-nnoremap </> @=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR> " 用 / 来开关折叠
+"autocmd FileType * exe "normal zR"
+nnoremap <C-/> @=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR> " 用 / 来开关折叠
 
 " Unbind some useless/annoying default key bindings.
 nmap Q <Nop> " 'Q' in normal mode enters Ex mode. You almost never want this.
@@ -79,7 +78,7 @@ vnoremap <C-Y> "+y
 vnoremap <C-D> "+d
 nnoremap <C-P> "+p
 inoremap <C-P> <ESC>"+p
-nnoremap <A-Z> :set wrap! " useless. cannot switch. 
+nnoremap <A-Z> :set wrap! " useless. cannot switch.
 
 nnoremap J <C-E>
 nnoremap K <C-Y>
@@ -109,15 +108,24 @@ nnoremap QQ :q!<CR>
 " :PlugUpdate
 
 let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
-let mapleader = "<space>"
+nnoremap <SPACE> <Nop>
+let g:mapleader=" "
 
 call plug#begin()
 
 Plug 'tomasr/molokai'
+Plug 'joshdick/onedark.vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+if !exists('g:airline_symbols')
+  let g:airline_symbols = {}
+endif
 let g:airline_theme = 'badwolf'
-
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#tabline#buffer_nr_show = 1
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
 Plug 'preservim/nerdtree'
@@ -168,10 +176,9 @@ call plug#end()
  " :MarkdownPreviewToggel
 let g:mkdp_path_to_chrome = '/usr/bin/firefox'
 let g:mkdp_markdown_css = ''
-let g:molokai_original = 1
 
 " Coc warning
-let g:coc_disable_startup_warning = 1 
+let g:coc_disable_startup_warning = 1
 
 
  " indentLine
@@ -182,41 +189,41 @@ let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 
 
 let g:coc_global_extensions = [
-	\ 'coc-css',
-	\ 'coc-diagnostic',
-	\ 'coc-docker',
-	\ 'coc-eslint',
-	\ 'coc-explorer',
-	\ 'coc-flutter-tools',
-	\ 'coc-gitignore',
-	\ 'coc-html',
-	\ 'coc-import-cost',
-	\ 'coc-java',
-	\ 'coc-jest',
-	\ 'coc-json',
-	\ 'coc-lists',
-	\ 'coc-omnisharp',
-	\ 'coc-prettier',
-	\ 'coc-prisma',
-	\ 'coc-pyright',
-	\ 'coc-snippets',
-	\ 'coc-sourcekit',
-	\ 'coc-stylelint',
-	\ 'coc-syntax',
-	\ 'coc-tasks',
-	\ 'coc-translator',
-	\ 'coc-tsserver',
-	\ 'coc-vetur',
-	\ 'coc-vimlsp',
-	\ 'coc-yaml',
-	\ 'coc-vimtex',
-	\ 'coc-texlab',
-	\ 'coc-highlight',
-	\ 'coc-clang-format-style-options',
+    \ 'coc-css',
+    \ 'coc-diagnostic',
+    \ 'coc-docker',
+    \ 'coc-eslint',
+    \ 'coc-explorer',
+    \ 'coc-flutter-tools',
+    \ 'coc-gitignore',
+    \ 'coc-html',
+    \ 'coc-import-cost',
+    \ 'coc-java',
+    \ 'coc-jest',
+    \ 'coc-json',
+    \ 'coc-lists',
+    \ 'coc-omnisharp',
+    \ 'coc-prettier',
+    \ 'coc-prisma',
+    \ 'coc-pyright',
+    \ 'coc-snippets',
+    \ 'coc-sourcekit',
+    \ 'coc-stylelint',
+    \ 'coc-syntax',
+    \ 'coc-tasks',
+    \ 'coc-translator',
+    \ 'coc-tsserver',
+    \ 'coc-vetur',
+    \ 'coc-vimlsp',
+    \ 'coc-yaml',
+    \ 'coc-vimtex',
+    \ 'coc-texlab',
+    \ 'coc-highlight',
+    \ 'coc-clang-format-style-options',
     \ 'coc-clangd',
-	\ 'coc-snippets',
-	\ 'coc-vimlsp',
-	\ 'coc-yank']
+    \ 'coc-snippets',
+    \ 'coc-vimlsp',
+    \ 'coc-yank']
 function! CheckBackspace() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
@@ -231,14 +238,94 @@ inoremap <expr> <Tab> coc#pum#visible() ? coc#pum#next(1) : "\<Tab>"
 inoremap <expr> <S-Tab> coc#pum#visible() ? coc#pum#prev(1) : "\<S-Tab>"
 inoremap <silent><expr> <c-space> coc#refresh()
 function! Show_documentation()
-	call CocActionAsync('highlight')
-	if (index(['vim','help'], &filetype) >= 0)
-		execute 'h '.expand('<cword>')
-	else
-		call CocAction('doHover')
-	endif
+    call CocActionAsync('highlight')
+    if (index(['vim','help'], &filetype) >= 0)
+        execute 'h '.expand('<cword>')
+    else
+        call CocAction('doHover')
+    endif
 endfunction
 nnoremap <LEADER>h :call Show_documentation()<CR>
+
+" ---*** coc explorer settings ***---
+" CoC Explorer Settings
+augroup MyCocExplorer
+  autocmd!
+  autocmd VimEnter * sil! au! F
+  " set window status line
+  autocmd FileType coc-explorer setl statusline=File-Explorer
+  "quit explorer whein it's the last
+  autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
+  " Make sure nothing opened in coc-explorer buffer
+  autocmd BufEnter * if bufname('#') =~# "\[coc-explorer\]-." && winnr('$') > 1 | b# | endif
+  " open if directory specified or if buffer empty
+  autocmd VimEnter * let d = expand('%:p')
+    \ | if argc() == 0
+      \ | exe 'CocCommand explorer --quit-on-open --position floating --sources buffer+,file+'
+    \ | elseif isdirectory(d) || (bufname()=='')
+      \ | silent! bd
+      \ | exe 'CocCommand explorer --quit-on-open --position floating --sources buffer+,file+ ' . d
+      \ | exe 'cd ' . d
+    \ | else
+      \ | cd %:p:h
+    \ | endif
+  " cd after open
+  autocmd User CocExplorerOpenPost let dir = getcwd() | call CocActionAsync("runCommand", "explorer.doAction", "closest", {"name": "cd", "args": [dir]})
+augroup END
+let g:coc_explorer_global_presets = {
+\   '.vim': {
+\     'root-uri': '~/.vim',
+\   },
+\   'cocConfig': {
+\      'root-uri': '~/.config/coc',
+\   },
+\   'tab': {
+\     'position': 'tab',
+\     'quit-on-open': v:true,
+\   },
+\   'tab:$': {
+\     'position': 'tab:$',
+\     'quit-on-open': v:true,
+\   },
+\   'floating': {
+\     'position': 'floating',
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'floatingTop': {
+\     'position': 'floating',
+\     'floating-position': 'center-top',
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'floatingLeftside': {
+\     'position': 'floating',
+\     'floating-position': 'left-center',
+\     'floating-width': 50,
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'floatingRightside': {
+\     'position': 'floating',
+\     'floating-position': 'right-center',
+\     'floating-width': 50,
+\     'open-action-strategy': 'sourceWindow',
+\   },
+\   'simplify': {
+\     'file-child-template': '[selection | clip | 1] [indent][icon | 1] [filename omitCenter 1]'
+\   },
+\   'buffer': {
+\     'sources': [{'name': 'buffer', 'expand': v:true}]
+\   },
+\ }
+
+" Use preset argument to open it
+nmap <space>ed <Cmd>CocCommand explorer --preset .vim<CR>
+nmap <space>ef <Cmd>CocCommand explorer --preset floating<CR>
+nmap <space>ec <Cmd>CocCommand explorer --preset cocConfig<CR>
+nmap <space>eb <Cmd>CocCommand explorer --preset buffer<CR>
+
+" ---*** coc explorer settings end ***---
+
+" List all presets
+nmap <space>el <Cmd>CocList explPresets<CR>
 
 " " set runtimepath^=~/.config/nvim/coc-extensions/coc-flutter-tools/
 " let g:coc_node_args = ['--nolazy', '--inspect-brk=6045']
@@ -267,7 +354,7 @@ nmap <silent> gy <Plug>(coc-type-definition)
 " nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 nmap <leader>rn <Plug>(coc-rename)
-nmap tt :CocCommand explorer<CR>
+nmap tt :CocCommand explorer --toggle --no-quit-on-open<CR>
 " coc-translator
 nmap ts <Plug>(coc-translator-p)
 " Remap for do codeAction of selected region
@@ -311,12 +398,12 @@ let g:vimtex_toc_config = {
 \ 'show_help' : 1,
 \ 'show_numbers' : 1,
 \}
-let g:vimtex_compiler_latexmk = { 
+let g:vimtex_compiler_latexmk = {
         \ 'executable' : 'latexmk',
-        \ 'options' : [ 
+        \ 'options' : [
         \   '-xelatex',
         \   '-file-line-error',
-		\	'-shell-escape',
+        \    '-shell-escape',
         \   '-synctex=1',
         \   '-interaction=nonstopmode',
         \ ],
@@ -327,7 +414,7 @@ let g:vimtex_compiler_latexmk_engines = {
 " clang-format
 " function! Formatonsave()
 "   let l:formatdiff = 1
-" 	pyf /home/pzy000/llvm/tools/clang/tools/clang-format/clang-format.py
+"     pyf /home/pzy000/llvm/tools/clang/tools/clang-format/clang-format.py
 " endfunction
 " autocmd BufWritePre *.h,*.cc,*.c,*.cpp call Formatonsave()
 
@@ -355,25 +442,31 @@ imap <c-h> <Left>
 imap <c-j> <Down>
 imap <c-k> <Up>
 imap <c-s> <ESC>:w<cr>
-imap <c-z> <ESC>ui
-imap <c-q> <Esc>
+inoremap <c-z> <ESC>ui
+inoremap <c-q> <Esc>
 nmap <c-s> :w<cr>
 nmap <c-e> :terminal<cr>
 nmap <c-n> :NERDTreeToggle<CR>:vert res 20<CR>
 nmap <C-_>   <Plug>NERDCommenterToggle
-vmap <C-_>   <Plug>NERDCommenterToggle<CR>
+vmap <C-_>   <Plug>NERDCommenterToggle
 nmap <c-b> :vert res 80<CR>
-nmap <c-t> :sp<CR><C-j>:term<CR>:res 10<CR>
-nmap <C-tab> :bn<cr>
-nmap <tab> :tabn<cr>
-nmap <S-tab> :tabp<cr>
+nmap <c-t> :sp<CR><C-j>:term<CR>:res 10<CR>icondac straw-capture<CR>
+nnoremap <tab> :bnext<cr>
+nnoremap <S-tab> :bp<cr>
+nnoremap L $
+nnoremap H 0
+nnoremap dL d$
+nnoremap cL c$
+nnoremap <A-l> :tabn<cr>
+nnoremap <A-h> :tabp<cr>
+nnoremap f /
+nnoremap <Leader>l :noh<cr>
 nmap <Leader>q :q<cr>
 nmap <c-Right> :vert res +5<cr>
 nmap <c-Left> :vert res -5<cr>
 nmap <c-Up> :res +2<cr>
 nmap <c-Down> :res -2<cr>
-nmap <c-6> :bn<cr>
-colorscheme gruvbox
+nmap <cr> o<Esc>
 set background=dark
 tmap <ESC> <C-\><C-n>
 tmap <c-h> <ESC><c-h>
@@ -386,10 +479,61 @@ nnoremap <silent>       <LocalLeader>rr :MagmaEvaluateLine<CR>
 xnoremap <silent>       <LocalLeader>r  :<C-u>MagmaEvaluateVisual<CR>
 nnoremap <silent>       <LocalLeader>rc :MagmaReevaluateCell<CR>
 nnoremap <silent>       <LocalLeader>rd :MagmaDelete<CR>
-nnoremap <silent>       <LocalLeader>ro :MagmaShowOutput<CR>
+nnoremap <silent>       <LocalLeader>ro :MagmaShowOutlput<CR>
 nmap <silent> ga <Plug>(coc-codeaction-line)
 xmap <silent> ga <Plug>(coc-codeaction-selected)
 nmap <silent> gA <Plug>(coc-codeaction)
 
 let g:magma_automatically_open_output = v:false
 let g:magma_image_provider = "ueberzug"
+
+" clipboard support just when neovim is build with +clipboard
+set clipboard+=unnamedplus
+
+" color scheme
+"colorscheme gruvbox
+if (has("autocmd"))
+  augroup colorextend
+    autocmd!
+    " Make `Function`s bold in GUI mode
+    autocmd ColorScheme * call onedark#extend_highlight("Function", { "gui": "bold" })
+    " Override the `Statement` foreground color in 256-color mode
+    autocmd ColorScheme * call onedark#extend_highlight("Statement", { "fg": { "cterm": 128 } })
+    " Override the `Identifier` background color in GUI mode
+    autocmd ColorScheme * call onedark#extend_highlight("Identifier", { "bg": { "gui": "#333333" } })
+  augroup END
+endif
+" onedark.vim override: Don't set a background color when running in a terminal;
+" just use the terminal's background color
+" `gui` is the hex color code used in GUI mode/nvim true-color mode
+" `cterm` is the color code used in 256-color mode
+" `cterm16` is the color code used in 16-color mode
+"if (has("autocmd") && !has("gui_running"))
+"
+  "augroup colorset
+    "autocmd!
+    "let s:white = { "gui": "#ABB2BF", "cterm": "145", "cterm16" : "7" }
+    "autocmd ColorScheme * call onedark#set_highlight("Normal", { "fg": s:white }) " `bg` will not be styled since there is no `bg` setting
+  "augroup END
+"endif
+colorscheme onedark
+let g:onedark_color_overrides = {
+\ "background": {"gui": "#2F343F", "cterm": "235", "cterm16": "0" },
+\ "purple": { "gui": "#C678DF", "cterm": "170", "cterm16": "5" }
+\}
+let g:onedark_termcolors=256
+let g:lightline = {
+  \ 'colorscheme': 'onedark',
+  \ }
+let g:airline_theme='onedark'
+"colorscheme molokai
+"let g:molokai_original = 1
+
+
+
+" Save session on quitting Vim
+autocmd VimLeave * NERDTreeClose
+autocmd VimLeave * mksession!
+
+" Restore session on starting Vim
+autocmd VimEnter * NERDTree

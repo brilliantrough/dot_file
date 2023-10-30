@@ -90,7 +90,7 @@
     "yank.enableCompletion": false,
     "typescript.suggestionActions.enabled": true,
     "jest.watch": false,
-    "explorer.width": 38,
+    "explorer.width": 30,
     "explorer.quitOnOpen": true,
     "explorer.sources": [
         {
@@ -109,28 +109,37 @@
     "explorer.keyMappingMode": "none",
     "explorer.buffer.showHiddenBuffers": false,
     "explorer.keyMappings.global": {
-        "u": "nodePrev",
-        "e": "nodeNext",
+        "k": "nodePrev",
+        "j": "nodeNext",
         "h": "toggleSelection",
         "<tab>": "actionMenu",
         "gl": "expandRecursive",
         "gh": "collapseRecursive",
-        "i": ["wait", "expandable?", "expand", "open"],
-        "<cr>": ["wait", "expandable?", "cd", "open"],
+        "i": ["wait", "expandable?", "expand", "preview:content"],
+        "<cr>": [
+            "wait",
+            "expandable?",
+            ["wait", "expanded?", "collapse", "expand"],
+            "open"
+        ],
+        "o": [
+            "wait",
+            "expandable?",
+            ["wait", "expanded?", "collapse", "expand"],
+            "open"
+        ],
         "I": "open:vsplit",
-        "o": ["wait", "expanded?", "collapse", "expand"],
         "O": "open:tab",
         "n": "collapse",
-        "l": "gotoParent",
+        "u": "gotoParent",
         "yp": "copyFilepath",
         "yn": "copyFilename",
         "yy": "copyFile",
         "dd": "cutFile",
         "pp": "pasteFile",
         "dD": "deleteForever",
-        "a": "addFile",
-        "k": "addFile",
-        "M": "addDirectory",
+        "t": "addFile",
+        "m": "addDirectory",
         "cw": "rename",
         ".": "toggleHidden",
         "zh": "toggleHidden",
@@ -182,6 +191,7 @@
     "pyocstring.doqPath": "~/miniconda3/envs/learning/bin/doq",
     "pydocstring.formatter": "google",
     "pydocstring.builtin.pythonPath": "~/miniconda3/envs/learning/bin/python",
+    "clangd.enabled": false,
     "clangd.path": "/usr/bin/clangd",
     "clangd.arguments": ["--background-index"],
     "html.format.enable": true,
@@ -242,11 +252,16 @@
             "args": ["--lib", "racket-langserver"],
             "filetypes": ["scheme", "racket"]
         },
-        //"clangd": {
-        //"command": "clangd",
-        //"rootPatterns": ["compile_flags.txt", "compile_commands.json"],
-        //"filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"]
-        //},
+        "ccls": {
+            "command": "ccls",
+            "rootPatterns": [
+                "compile_flags.txt",
+                "compile_commands.json",
+                ".ccls"
+            ],
+            "filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"]
+        },
+
         "latex": {
             "command": "/home/pzy000/widget/texlab/texlab",
             "filetypes": ["tex", "bib", "plaintex", "context"]

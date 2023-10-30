@@ -510,6 +510,8 @@ tmux_conf_uninstall_plugins_on_reload=false
 # # List of plugins
 set -g @plugin 'christoomey/vim-tmux-navigator'
 
+# onedark theme
+set -g @plugin 'odedlaz/tmux-onedark-theme'
 # use y to yank
 set -g @plugin 'tmux-plugins/tmux-yank'
 
