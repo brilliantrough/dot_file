@@ -69,22 +69,6 @@
         "$HOME/.config/nvim/plugged/vim-snippets/UltiSnips/"
     ],
     "coc.preferences.formatOnSave": true,
-    "coc.preferences.formatOnSaveFiletypes": [
-        "javascript",
-        "typescript",
-        "typescriptreact",
-        "html",
-        "css",
-        "json",
-        "jsonc",
-        "java",
-        "vue",
-        "svelte",
-        "cs",
-        "racket",
-        "prisma",
-        "python"
-    ],
     "yaml.format.enable": true,
     "signature.target": "float",
     "yank.enableCompletion": false,
@@ -254,12 +238,13 @@
         },
         "ccls": {
             "command": "ccls",
-            "rootPatterns": [
-                "compile_flags.txt",
-                "compile_commands.json",
-                ".ccls"
-            ],
-            "filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"]
+            "rootPatterns": [".ccls", "compile_commands.json", ".git/", ".hg/"],
+            "filetypes": ["c", "cc", "cpp", "c++", "objc", "objcpp"],
+            "initializationOptions": {
+                "cache": {
+                    "directory": "/tmp/ccls"
+                }
+            }
         },
 
         "latex": {

@@ -1,3 +1,34 @@
+" __  ____   __  _   ___     _____ __  __ ____   ____
+"|  \/  \ \ / / | \ | \ \   / /_ _|  \/  |  _ \ / ___|
+"| |\/| |\ V /  |  \| |\ \ / / | || |\/| | |_) | |
+"| |  | | | |   | |\  | \ V /  | || |  | |  _ <| |___
+"|_|  |_| |_|   |_| \_|  \_/  |___|_|  |_|_| \_\\____|
+
+" Author: @pezayo
+" Version: 1.0.0
+" Contributors: @pezayo, @theniceboy
+
+" ==================== Auto load for first time uses ====================
+"if empty(glob($HOME.'/.config/nvim/autoload/plug.vim'))
+	"silent !curl -fLo $HOME/.config/nvim/autoload/plug.vim --create-dirs
+				"\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	"autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+"endif
+
+let g:nvim_plugins_installation_completed=1
+"if empty(glob($HOME.'/.config/nvim/plugged/wildfire.vim/autoload/wildfire.vim'))
+	"let g:nvim_plugins_installation_completed=0
+	"autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+"endif
+
+" Create a _machine_specific.vim file to adjust machine specific stuff, like python interpreter location 
+let has_machine_specific_file = 1
+if empty(glob('~/.config/nvim/_machine_specific.vim'))
+	let has_machine_specific_file = 0
+	silent! exec "!cp ~/.config/nvim/default_configs/_machine_specific_default.vim ~/.config/nvim/_machine_specific.vim"
+endif
+source $HOME/.config/nvim/_machine_specific.vim
+
 "True Color
 set t_Co=256
 if has("termguicolors")
@@ -131,6 +162,9 @@ Plug 'tpope/vim-fugitive'
 Plug 'preservim/nerdtree'
 let NERDTreeShowHidden=1
 
+
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/playground'
 Plug 'Yggdroot/indentLine'
 Plug 'tmsvg/pear-tree'
 Plug 'godlygeek/tabular'
@@ -138,6 +172,7 @@ Plug 'scrooloose/syntastic'
 "Plug 'altercation/vim-colors-solarized'
 "Plug 'majutsushi/tagbar'
 Plug 'SirVer/ultisnips'
+let g:UltiSnipsExpandTrigger="<c-0>"
 Plug 'honza/vim-snippets'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'lervag/vimtex'
@@ -170,6 +205,7 @@ Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'github/copilot.vim'
 Plug 'tpope/vim-obsession'
 Plug 'untitled-ai/jupyter_ascending.vim'
+Plug 'tpope/vim-surround' " type yskw' to wrap the word with '' or type cs'` to change 'word' to `word`
 
 call plug#end()
 " markdown config
@@ -177,8 +213,6 @@ call plug#end()
 let g:mkdp_path_to_chrome = '/usr/bin/firefox'
 let g:mkdp_markdown_css = ''
 
-" Coc warning
-let g:coc_disable_startup_warning = 1
 
 
  " indentLine
@@ -188,6 +222,9 @@ let g:indent_guides_start_level = 2
 let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 
 
+" ==================== coc.nvim ====================
+" Coc warning
+let g:coc_disable_startup_warning = 1
 let g:coc_global_extensions = [
     \ 'coc-css',
     \ 'coc-diagnostic',
@@ -223,6 +260,7 @@ let g:coc_global_extensions = [
     \ 'coc-clangd',
     \ 'coc-snippets',
     \ 'coc-vimlsp',
+    \ 'coc-actions',
     \ 'coc-yank']
 function! CheckBackspace() abort
   let col = col('.') - 1
@@ -459,8 +497,8 @@ nnoremap dL d$
 nnoremap cL c$
 nnoremap <A-l> :tabn<cr>
 nnoremap <A-h> :tabp<cr>
-nnoremap f /
-nnoremap <Leader>l :noh<cr>
+nnoremap <c-f> /
+nnoremap <silent> <Leader>l :noh<cr>
 nmap <Leader>q :q<cr>
 nmap <c-Right> :vert res +5<cr>
 nmap <c-Left> :vert res -5<cr>
@@ -536,4 +574,70 @@ autocmd VimLeave * NERDTreeClose
 autocmd VimLeave * mksession!
 
 " Restore session on starting Vim
-autocmd VimEnter * NERDTree
+"autocmd VimEnter * NERDTree
+
+
+" ==================== nvim-treesitter ====================
+if g:nvim_plugins_installation_completed == 1
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all" (the five listed parsers should always be installed)
+  ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "typescript", "dart", "java", "prisma", "bash", "go"},
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  -- Automatically install missing parsers when entering buffer
+  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+  auto_install = true,
+
+  -- List of parsers to ignore installing (or "all")
+  ignore_install = { "javascript" },
+
+  ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
+  -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
+
+  highlight = {
+    enable = true,
+
+    -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+    -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+    -- the name of the parser)
+    -- list of language that will be disabled
+    -- disable = { "c", "rust" },
+    -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
+    disable = function(lang, buf)
+        local max_filesize = 100 * 1024 -- 100 KB
+        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+        if ok and stats and stats.size > max_filesize then
+            return true
+        end
+    end,
+
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+  playground = {
+    enable = true,
+    disable = {},
+    updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+    persist_queries = false, -- Whether the query persists across vim sessions
+    keybindings = {
+      toggle_query_editor = 'o',
+      toggle_hl_groups = 'i',
+      toggle_injected_languages = 't',
+      toggle_anonymous_nodes = 'a',
+      toggle_language_display = 'I',
+      focus_language = 'f',
+      unfocus_language = 'F',
+      update = 'R',
+      goto_node = '<cr>',
+      show_help = '?',
+    },
+  }
+}
+EOF
+endif
