@@ -8,9 +8,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="robbyrussell"
-# ZSH_THEME="random"
-# ZSH_THEME="cloud"
+# ZSH_THEME="robbyrussell" ZSH_THEME="random" ZSH_THEME="cloud"
 ZSH_THEME="clean"
 # ZSH_THEME="xiong-chiamiov"
 
@@ -74,10 +72,30 @@ ZSH_THEME="clean"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git autojump zsh-autosuggestions zsh-syntax-highlighting tmux shell-proxy)
+plugins=(git autojump zsh-autosuggestions zsh-syntax-highlighting tmux shell-proxy zsh-vi-mode)
 
+fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
 source $ZSH/oh-my-zsh.sh
+zvm_after_init_commands+=(
+  'bindkey -M viins "^o" forward-char'
+  'bindkey -M vicmd "^o" forward-char'
+  'bindkey -M viins "^u" forward-word'
+  'bindkey -M vicmd "^u" forward-word'
+)
+# Your custom widget
+function my_custom_widget() {
+  echo 'Hello, ZSH!'
+}
 
+# The plugin will auto execute this zvm_after_lazy_keybindings function
+function zvm_after_lazy_keybindings() {
+  # Here we define the custom widget
+  zvm_define_widget my_custom_widget
+
+  # In normal mode, press Ctrl-E to invoke this widget
+  zvm_bindkey vicmd '^E' my_custom_widget
+  zvm_bindkey viins '^E' my_custom_widget
+}
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -103,14 +121,17 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-if [ -f ~/.bash_aliases ]; then
-    source ~/.bash_aliases
+if [ -f ~/.aliases ]; then
+    source ~/.aliases
 fi
 
-if [ -f ~/.bash_path ]; then
-    source ~/.bash_path
+if [ -f ~/.func ]; then
+    source ~/.func
 fi
 
+if [ -f ~/.variable ]; then
+    source ~/.variable
+fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm

@@ -1,0 +1,133 @@
+setproxy() {
+  export http_proxy="http://localhost:7890"
+  export https_proxy="http://localhost:7890"
+  export all_proxy="http://localhost:7890"
+  export HTTP_PROXY="http://localhost:7890"
+  export HTTPS_PROXY="http://localhost:7890"
+  export ALL_PROXY="http://localhost:7890"
+}
+
+initproxy() {
+  unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+}
+
+
+search_file() {
+    # 检查参数
+    if [ $# -lt 2 ]; then
+        echo "Usage: search_file <directory> <file_pattern> [excluded_dirs...]"
+        echo "Example: search_file /path/to/directory '*.bin' .venv node_modules"
+        return 1
+    fi
+
+    local directory="$1"
+    local file_pattern="$2"
+    shift 2  # 移除前两个参数
+
+    # 检查目录是否存在
+    if [ ! -d "$directory" ]; then
+        echo "Error: Directory '$directory' does not exist."
+        return 1
+    fi
+
+    # 构建 find 命令的排除选项
+    local exclude_opts=""
+    for excluded_dir in "$@"; do
+        exclude_opts="$exclude_opts -not -path \"*/$excluded_dir/*\""
+    done
+
+    # 搜索文件并打印信息
+    eval find "$directory" -type f -name "$file_pattern" $exclude_opts | while IFS= read -r file; do
+        local relative_path="${file#$directory/}"
+        local size=$(du -h "$file" | cut -f1)
+        echo -e "$relative_path \033[032m$size\033[0m bytes"
+    done
+}
+
+mykill() {
+  kill -9 $(ps -ef | grep "$1" | egrep -v -E "grep|mykill" | awk "{print \$2}")
+}
+
+find_process() {
+  #!/bin/bash
+
+  # 检查用户是否提供了程序名称
+  if [ -z "$1" ]; then
+      echo "Usage: $0 <program-name>"
+      exit 1
+  fi
+
+  PROGRAM_NAME=$1
+
+  # 获取当前脚本的 PID，以便在过滤时排除它
+  SCRIPT_PID=$$
+
+  # 使用 ps 命令查找匹配的程序，并提取唯一的 PID 列表，排除掉当前脚本本身及 grep 命令的进程
+  PIDS=$(ps aux | grep "$PROGRAM_NAME" | grep -v grep | awk '{if ($2 != '$SCRIPT_PID') print $2}' | sort -u)
+
+  if [ -z "$PIDS" ]; then
+      echo "No process matches the program name $PROGRAM_NAME"
+      exit 1
+  fi
+
+  # 遍历每个唯一的 PID
+  for PID in $PIDS; do
+      # 使用 ps 命令获取命令信息
+      INFO=$(ps -p "$PID" -o user=,etime=,lstart=,cmd=)
+
+      # 排除 PID 不存在或无效的情况
+      if [ -z "$INFO" ]; then
+          continue
+      fi
+
+      # 输出结果
+      echo "Process matching program name $PROGRAM_NAME:"
+      echo "PID: $PID"
+      echo "User: $(echo "$INFO" | awk '{print $1}')"
+      echo "Elapsed Time: $(echo "$INFO" | awk '{print $2}')"
+      echo "Start Time: $(echo "$INFO" | awk '{print $3, $4, $5, $6, $7}')"
+      echo "Command: $(echo "$INFO" | awk '{for (i=8; i<=NF; i++) printf "%s ", $i; print ""}')"
+      echo
+  done
+}
+
+check_port() {
+  #!/bin/bash
+
+  # 检查用户是否提供了端口号
+  if [ -z "$1" ]; then
+    echo "Usage: $0 <port>"
+    exit 1
+  fi
+
+  PORT=$1
+
+  # 使用 ss 命令查找指定端口的进程信息，并提取唯一的 PID 列表
+  PIDS=$(sudo ss -tulnp | grep ":$PORT " | awk '{print $NF}' | awk -F',' '{print $2}' | awk -F'=' '{print $2}' | sort -u)
+
+  if [ -z "$PIDS" ]; then
+    echo "No process is listening on port $PORT"
+    exit 1
+  fi
+
+  # 遍历每个唯一的 PID
+  for PID in $PIDS; do
+    # 检查 PID 是否为数字
+    if ! [[ "$PID" =~ ^[0-9]+$ ]]; then
+      echo "Failed to extract a valid PID for port $PORT"
+      continue
+    fi
+
+    # 使用 ps 命令获取命令信息
+    INFO=$(ps -p "$PID" -o user=,etime=,lstart=,cmd=)
+
+    # 输出结果
+    echo "Port $PORT is being used by process:"
+    echo "PID: $PID"
+    echo "User: $(echo "$INFO" | awk '{print $1}')"
+    echo "Elapsed Time: $(echo "$INFO" | awk '{print $2}')"
+    echo "Start Time: $(echo "$INFO" | awk '{print $3, $4, $5, $6, $7}')"
+    echo "Command: $(echo "$INFO" | awk '{for (i=8; i<=NF; i++) printf "%s ", $i; print ""}')"
+    echo
+  done
+}

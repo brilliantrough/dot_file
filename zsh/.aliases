@@ -1,0 +1,28 @@
+# xclip setting
+alias "c=xclip"
+alias "v=xclip -o"
+alias "copy=xclip -selection clipboard"
+
+# alias nvim to n
+alias "n=nvim"
+
+alias "xo=xdg-open"
+
+alias "trans=~/miniconda3/envs/learning/bin/python ~/Linewrite/Python/Source_code/google-translate/select-trans.py"
+alias "chat=~/miniconda3/envs/learning/bin/python ~/widget/chatbot/chatbot.py"
+alias "condade=conda deactivate"
+alias "condac=conda activate"
+alias "tm=tmux"
+alias "npt=cd /home/pzy000/Linewrite/Python/Project/qt/not-powerful-translator-pyqt5; nohup /home/pzy000/miniconda3/envs/npt/bin/python mainwindow.py > /dev/null 2>&1 &; cd -"
+
+alias b='cd ..'
+alias bb='cd ../..'
+alias bbb='cd ../../..'
+alias bbbb='cd ../../../..'
+alias bbbbb='cd ../../../../..'
+
+alias mk='make'
+alias mkdir='mkdir -p'
+alias df='df -h'
+alias xo='xdg-open'
+
