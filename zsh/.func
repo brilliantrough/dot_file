@@ -12,36 +12,36 @@ initproxy() {
 }
 
 
-search_file() {
-    # 检查参数
-    if [ $# -lt 2 ]; then
-        echo "Usage: search_file <directory> <file_pattern> [excluded_dirs...]"
-        echo "Example: search_file /path/to/directory '*.bin' .venv node_modules"
-        return 1
-    fi
-
-    local directory="$1"
-    local file_pattern="$2"
-    shift 2  # 移除前两个参数
-
-    # 检查目录是否存在
-    if [ ! -d "$directory" ]; then
-        echo "Error: Directory '$directory' does not exist."
-        return 1
-    fi
-
-    # 构建 find 命令的排除选项
-    local exclude_opts=""
-    for excluded_dir in "$@"; do
-        exclude_opts="$exclude_opts -not -path \"*/$excluded_dir/*\""
-    done
-
-    # 搜索文件并打印信息
-    eval find "$directory" -type f -name "$file_pattern" $exclude_opts | while IFS= read -r file; do
-        local relative_path="${file#$directory/}"
-        local size=$(du -h "$file" | cut -f1)
-        echo -e "$relative_path \033[032m$size\033[0m bytes"
-    done
+search_file () {
+	if [ $# -lt 2 ]
+	then
+		echo "Usage: search_file <directory> <search_term> [excluded_dirs...]"
+		echo "Example: search_file /path/to/directory 'AppImage' .venv node_modules"
+		return 1
+	fi
+	local directory="$1" 
+	local search_term="$2" 
+	shift 2
+	if [ ! -d "$directory" ]
+	then
+		echo "Error: Directory '$directory' does not exist."
+		return 1
+	fi
+	local find_params=()
+	find_params+=("$directory" -type f)
+	for excluded_dir in "$@"
+	do
+		find_params+=(-not -path "*/$excluded_dir/*")
+	done
+	# 使用grep对搜索结果进行过滤
+	find "${find_params[@]}" | grep "$search_term" | while IFS= read -r file
+	do
+		local relative_path="${file#$directory/}" 
+		local size=$(du -h "$file" | cut -f1)
+		# 使用ANSI编码给文件名中匹配的部分加颜色
+		local highlighted_path=$(echo "$relative_path" | sed "s/$search_term/\x1b[31m&\x1b[0m/g")
+		echo -e "$highlighted_path \033[32m$size\033[0m bytes"
+	done
 }
 
 mykill() {
@@ -103,11 +103,10 @@ check_port() {
   PORT=$1
 
   # 使用 ss 命令查找指定端口的进程信息，并提取唯一的 PID 列表
-  PIDS=$(sudo ss -tulnp | grep ":$PORT " | awk '{print $NF}' | awk -F',' '{print $2}' | awk -F'=' '{print $2}' | sort -u)
+  PIDS=$(ss -tulnp | grep ":$PORT " | awk '{print $NF}' | awk -F',' '{print $2}' | awk -F'=' '{print $2}' | sort -u)
 
   if [ -z "$PIDS" ]; then
     echo "No process is listening on port $PORT"
-    exit 1
   fi
 
   # 遍历每个唯一的 PID
