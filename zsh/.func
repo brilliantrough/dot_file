@@ -48,47 +48,53 @@ mykill() {
   kill -9 $(ps -ef | grep "$1" | egrep -v -E "grep|mykill" | awk "{print \$2}")
 }
 
-find_process() {
-  #!/bin/bash
-
-  # 检查用户是否提供了程序名称
-  if [ -z "$1" ]; then
-      echo "Usage: $0 <program-name>"
-      exit 1
-  fi
-
-  PROGRAM_NAME=$1
-
-  # 获取当前脚本的 PID，以便在过滤时排除它
-  SCRIPT_PID=$$
-
-  # 使用 ps 命令查找匹配的程序，并提取唯一的 PID 列表，排除掉当前脚本本身及 grep 命令的进程
-  PIDS=$(ps aux | grep "$PROGRAM_NAME" | grep -v grep | awk '{if ($2 != '$SCRIPT_PID') print $2}' | sort -u)
-
-  if [ -z "$PIDS" ]; then
-      echo "No process matches the program name $PROGRAM_NAME"
-      exit 1
-  fi
-
-  # 遍历每个唯一的 PID
-  for PID in $PIDS; do
-      # 使用 ps 命令获取命令信息
-      INFO=$(ps -p "$PID" -o user=,etime=,lstart=,cmd=)
-
-      # 排除 PID 不存在或无效的情况
-      if [ -z "$INFO" ]; then
-          continue
-      fi
-
-      # 输出结果
-      echo "Process matching program name $PROGRAM_NAME:"
-      echo "PID: $PID"
-      echo "User: $(echo "$INFO" | awk '{print $1}')"
-      echo "Elapsed Time: $(echo "$INFO" | awk '{print $2}')"
-      echo "Start Time: $(echo "$INFO" | awk '{print $3, $4, $5, $6, $7}')"
-      echo "Command: $(echo "$INFO" | awk '{for (i=8; i<=NF; i++) printf "%s ", $i; print ""}')"
-      echo
-  done
+find_process () {
+        if [ -z "$1" ]
+        then
+                echo "Usage: find_process <pattern>"
+                return 1
+        fi
+        PATTERN="$1" 
+        SCRIPT_PID=$$ 
+        PROCESS_LIST=$(ps -ef | grep -i "$PATTERN" | grep -v "grep" | grep -v "$SCRIPT_PID") 
+        if [ -z "$PROCESS_LIST" ]
+        then
+                echo "No processes matching '$PATTERN' found."
+                return 1
+        fi
+        echo "Found processes matching '$PATTERN':"
+        echo "----------------------------------------"
+        TEMP_FILE=$(mktemp) 
+        echo "$PROCESS_LIST" > "$TEMP_FILE"
+        COUNT=$(wc -l < "$TEMP_FILE") 
+        while IFS= read -r line
+        do
+                PID=$(echo "$line" | awk '{print $2}') 
+                PARENT_PID=$(echo "$line" | awk '{print $3}') 
+                USER=$(echo "$line" | awk '{print $1}') 
+                CMD=$(echo "$line" | awk '{for(i=8;i<=NF;i++) printf "%s ", $i}') 
+                
+                # 获取进程的启动时间
+                START_TIME=$(ps -p $PID -o lstart= 2>/dev/null || echo "N/A")
+                
+                # 获取进程已运行的时间
+                ELAPSED_TIME=$(ps -p $PID -o etime= 2>/dev/null || echo "N/A")
+                
+                # 获取进程累计的CPU时间
+                CPU_TIME=$(ps -p $PID -o time= 2>/dev/null || echo "N/A")
+                
+                echo "PID: $PID (Parent: $PARENT_PID)"
+                echo "User: $USER"
+                echo "CPU%: $(ps -p $PID -o %cpu= 2>/dev/null || echo "N/A")"
+                echo "MEM%: $(ps -p $PID -o %mem= 2>/dev/null || echo "N/A")"
+                echo "Start Time: $START_TIME"
+                echo "Running Time: $ELAPSED_TIME"
+                echo "CPU Time: $CPU_TIME"
+                echo "Command: $CMD"
+                echo "----------------------------------------"
+        done < "$TEMP_FILE"
+        rm -f "$TEMP_FILE"
+        echo "Total: $COUNT process(es) found"
 }
 
 check_port() {
@@ -103,7 +109,7 @@ check_port() {
   PORT=$1
 
   # 使用 ss 命令查找指定端口的进程信息，并提取唯一的 PID 列表
-  PIDS=$(ss -tulnp | grep ":$PORT " | awk '{print $NF}' | awk -F',' '{print $2}' | awk -F'=' '{print $2}' | sort -u)
+  PIDS=$(sudo ss -tulnp | grep ":$PORT " | awk '{print $NF}' | awk -F',' '{print $2}' | awk -F'=' '{print $2}' | sort -u)
 
   if [ -z "$PIDS" ]; then
     echo "No process is listening on port $PORT"
