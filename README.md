@@ -10,6 +10,17 @@
 
 `init.vim` 和 `coc-settings.json` 文件
 
+## lvim
+
+LunarVim 配置文件，放在 `~/.config/lvim/` 目录下。
+
+如果已经安装好 LunarVim，可在仓库根目录执行：
+
+```bash
+mkdir -p ~/.config/lvim
+cp -r lvim/* ~/.config/lvim/
+```
+
 ## squid
 
 `/etc/squid/squid.conf` 文件
