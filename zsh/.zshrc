@@ -76,6 +76,10 @@ plugins=(git autojump zsh-autosuggestions zsh-syntax-highlighting tmux shell-pro
 
 fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
 source $ZSH/oh-my-zsh.sh
+
+# bindkey '^O' forward-char
+# bindkey '^U' forward-word
+
 zvm_after_init_commands+=(
   'bindkey -M viins "^o" forward-char'
   'bindkey -M vicmd "^o" forward-char'

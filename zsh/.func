@@ -5,6 +5,7 @@ setproxy() {
   export HTTP_PROXY="http://localhost:7890"
   export HTTPS_PROXY="http://localhost:7890"
   export ALL_PROXY="http://localhost:7890"
+  export NO_PROXY="localhost,127.0.0.1,169.254.0.0/16"
 }
 
 initproxy() {
