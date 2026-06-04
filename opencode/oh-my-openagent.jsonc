@@ -1,0 +1,419 @@
+{
+  // ============================================
+  // oh-my-opencode 配置文件模板
+  // 支持 .json 或 .jsonc 格式 (jsonc 支持注释)
+  // ============================================
+
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/dev/assets/oh-my-opencode.schema.json",
+
+  // ============================================
+  // 基础配置
+  // ============================================
+
+  // 启用新任务系统
+  // new_task_system_enabled: false,
+
+  // 默认运行的代理 (如 "sisyphus", "build", "plan")
+  // default_run_agent: "sisyphus",
+
+  // 自动更新
+  // auto_update: true,
+
+  // ============================================
+  // MCP 服务器配置 (内置)
+  // ============================================
+
+  // 禁用的 MCP 服务器 (可选: websearch, context7, grep_app)
+  "disabled_mcps": ["websearch", "context7",],
+
+  // WebSearch 提供商 (可选: exa, tavily)
+  // websearch: {
+  //   provider: "exa"
+  // },
+
+  // ============================================
+  // 代理配置
+  // ============================================
+
+  // 禁用的代理列表
+  // disabled_agents: [],
+
+  "agents": {
+    "build": {
+      "model": "codex-newapi/gpt-5.5",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+      "variant": "xhigh"
+    },
+    "plan": {
+      "model": "codex-newapi/gpt-5.5",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+    },
+    "sisyphus": {
+      "model": "codex-newapi/gpt-5.4",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+      "variant": "xhigh"
+    },
+    "hephaestus": {
+      "model": "codex-newapi/gpt-5.5",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+      "allow_non_gpt_model": false
+    },
+    "prometheus": {
+      "model": "codex-newapi/gpt-5.5",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+    },
+    "metis": {
+      "model": "codex-newapi/gpt-5.5",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+    },
+    "momus": {
+      "model": "codex-newapi/gpt-5.5",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+    },
+    "oracle": {
+      "model": "codex-newapi/gpt-5.5",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+    },
+    "explore": {
+      "model": "anthropic-newapi/minimax-latest",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+    },
+    "librarian": {
+      "model": "anthropic-newapi/mimo-latest",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+    },
+    "atlas": {
+      "model": "codex-newapi/gpt-5.5",
+      "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
+    }
+  },
+
+  // ============================================
+  // 任务类别配置
+  // ============================================
+
+  // 禁用的 skills (可选: playwright, agent-browser, dev-browser, frontend-ui-ux, git-master)
+  "disabled_skills": ["playwright", "agent-browser", "dev-browser", "frontend-ui-ux", "git-master"],
+
+  "categories": {
+    // 视觉工程类别
+    "visual-engineering": {
+      "description": "UI/UX development, frontend, design systems",
+      "model": "codex-newapi/gpt-5.5",
+      // fallback_models: [],
+      // variant: "stable",
+      // temperature: 0.7,
+      // top_p: 0.9,
+      // maxTokens: 4096,
+      // thinking: { type: "enabled", budgetTokens: 1024 },
+      // reasoningEffort: "high",
+      // textVerbosity: "medium",
+      // tools: { "bash": true, "read": true, "edit": true },
+      // prompt_append: "",
+      // max_prompt_tokens: 8000,
+      // is_unstable_agent: false,
+      // disable: false
+    },
+  
+    // 深度分析类别
+    "deep": {
+      "description": "Deep analysis, research, architectural decisions",
+      "model": "codex-newapi/gpt-5.5",
+      "variant": "xhigh"
+    },
+  
+    // 快速任务类别
+    "quick": {
+      "description": "Quick edits, small changes",
+      "model": "anthropic-newapi/minimax-latest",
+    },
+  
+    // 艺术创作类别
+    "artistry": {
+      "description": "Creative writing, content generation",
+      "model": "codex-newapi/gpt-5.5",
+    },
+  
+    // 写作类别
+    "writing": {
+      "description": "Writing and editing tasks",
+      "model": "codex-newapi/gpt-5.5",
+    },
+  
+    // Ultra Brain - 复杂推理
+    "ultrabrain": {
+      "description": "Complex reasoning and problem solving",
+      "model": "codex-newapi/gpt-5.5",
+      "variant": "xhigh"
+    }
+  },
+
+  // ============================================
+  // Claude Code 兼容性配置
+  // ============================================
+
+  "claude_code": {
+    // 是否加载 Claude Code 的 MCP 配置
+    "mcp": false,
+    // 是否加载 Claude Code 的 commands
+    "commands": true,
+    // 是否加载 Claude Code 的 skills
+    "skills": true,
+    // 是否加载 Claude Code 的 agents
+    "agents": true,
+    // 是否加载 Claude Code 的 hooks
+    "hooks": false,
+    // 是否加载 Claude Code 的 plugins
+    "plugins": false,
+    // 插件覆盖配置
+    // plugins_override: {
+    //   "plugin-name": false
+    // }
+  },
+
+  // ============================================
+  // Sisyphus Agent 配置
+  // ============================================
+
+  // sisyphus_agent: {
+  //   disabled: false,
+  //   default_builder_enabled: true,
+  //   planner_enabled: true,
+  //   replace_plan: false
+  // },
+
+  // ============================================
+  // Comment Checker 配置
+  // ============================================
+
+  // comment_checker: {
+  //   custom_prompt: ""
+  // },
+
+  // ============================================
+  // 实验性功能
+  // ============================================
+
+  // experimental: {
+  //   // 激进截断
+  //   aggressive_truncation: false,
+  //   // 自动恢复
+  //   auto_resume: false,
+  //   // 抢先压缩
+  //   preemptive_compaction: false,
+  //   // 截断所有工具输出
+  //   truncate_all_tool_outputs: false,
+  //   // 动态上下文修剪
+  //   dynamic_context_pruning: {
+  //     enabled: false,
+  //     notification: "detailed",
+  //     // turn_protection: {
+  //     //   enabled: true,
+  //     //   turns: 3
+  //     // },
+  //     // protected_tools: ["task", "todowrite", "todoread"],
+  //     // strategies: {
+  //     //   deduplication: { enabled: true },
+  //     //   supersede_writes: { enabled: true, aggressive: false },
+  //     //   purge_errors: { enabled: true, turns: 5 }
+  //     // }
+  //   },
+  //   // 任务系统
+  //   task_system: false,
+  //   // 插件加载超时 (毫秒)
+  //   // plugin_load_timeout_ms: 30000,
+  //   // 安全 Hook 创建
+  //   safe_hook_creation: true,
+  //   // 禁用 OMO 环境变量
+  //   disable_omo_env: false,
+  //   // Hashline 编辑
+  //   hashline_edit: false,
+  //   // 模型回退标题
+  //   model_fallback_title: false
+  // },
+
+  // ============================================
+  // Skills 配置
+  // ============================================
+
+  // skills: [
+  //   // "skill-name-1",
+  //   // "skill-name-2"
+  // ]
+  // 或
+  // skills: {
+  //   sources: [
+  //     { path: "/path/to/skills", recursive: true, glob: "*.md" }
+  //   ],
+  //   enable: [],
+  //   disable: []
+  // },
+
+  // ============================================
+  // Ralph Loop 配置
+  // ============================================
+
+  // ralph_loop: {
+  //   enabled: false,
+  //   default_max_iterations: 100,
+  //   // state_dir: ".sisyphus/ralph-loop.local.md",
+  //   default_strategy: "continue"  // "reset" 或 "continue"
+  // },
+
+  // ============================================
+  // Runtime Fallback 配置
+  // ============================================
+
+  // runtime_fallback: false
+  // 或
+  // runtime_fallback: {
+  //   enabled: true,
+  //   // retry_on_errors: [500, 502, 503],
+  //   // max_fallback_attempts: 5,
+  //   // cooldown_seconds: 30,
+  //   // timeout_seconds: 60,
+  //   // notify_on_fallback: true
+  // },
+
+  // ============================================
+  // 后台任务配置
+  // ============================================
+
+  // background_task: {
+  //   // defaultConcurrency: 3,
+  //   // providerConcurrency: { "openai": 5 },
+  //   // modelConcurrency: { "gpt-4": 2 },
+  //   // staleTimeoutMs: 300000,
+  //   // messageStalenessTimeoutMs: 60000
+  // },
+
+  // ============================================
+  // 通知配置
+  // ============================================
+
+  // notification: {
+  //   force_enable: false
+  // },
+
+  // ============================================
+  // Babysitting 配置
+  // ============================================
+
+  // babysitting: {
+  //   timeout_ms: 120000
+  // },
+
+  // ============================================
+  // Git Master 配置
+  // ============================================
+
+  // git_master: {
+  //   // commit_footer: true,
+  //   // 或自定义 footer
+  //   // commit_footer: "Co-authored-by: Name <email>",
+  //   include_co_authored_by: true
+  // },
+
+  // ============================================
+  // 浏览器自动化配置
+  // ============================================
+
+  // browser_automation_engine: {
+  //   provider: "playwright"  // 可选: playwright, agent-browser, dev-browser, playwright-cli
+  // },
+
+  // ============================================
+  // Tmux 配置
+  // ============================================
+
+  // tmux: {
+  //   enabled: false,
+  //   layout: "main-vertical",  // main-horizontal, main-vertical, tiled, even-horizontal, even-vertical
+  //   main_pane_size: 60,
+  //   main_pane_min_width: 120,
+  //   agent_pane_min_width: 40
+  // },
+
+  // ============================================
+  // Sisyphus 配置
+  // ============================================
+
+  // sisyphus: {
+  //   tasks: {
+  //     // storage_path: ".sisyphus/tasks",
+  //     // task_list_id: "",
+  //     claude_code_compat: false
+  //   }
+  // },
+
+  // ============================================
+  // 禁用配置
+  // ============================================
+
+  // 禁用的 hooks (完整列表见下方)
+  // disabled_hooks: [],
+
+  // 禁用的 commands (可选: init-deep, ralph-loop, ulw-loop, cancel-ralph, refactor, start-work, stop-continuation)
+  // disabled_commands: [],
+
+  // 禁用的 tools
+  // disabled_tools: [],
+
+  // ============================================
+  // 其他配置
+  // ============================================
+
+  // hashline_edit: false,
+  "model_fallback": false
+}
+
+// ============================================
+// 可禁用的 Hooks 完整列表
+// ============================================
+// todo-continuation-enforcer
+// context-window-monitor
+// session-recovery
+// session-notification
+// comment-checker
+// tool-output-truncator
+// question-label-truncator
+// directory-agents-injector
+// directory-readme-injector
+// empty-task-response-detector
+// think-mode
+// model-fallback
+// anthropic-context-window-limit-recovery
+// preemptive-compaction
+// rules-injector
+// background-notification
+// auto-update-checker
+// startup-toast
+// keyword-detector
+// agent-usage-reminder
+// non-interactive-env
+// interactive-bash-session
+// thinking-block-validator
+// ralph-loop
+// category-skill-reminder
+// compaction-context-injector
+// compaction-todo-preserver
+// claude-code-hooks
+// auto-slash-command
+// edit-error-recovery
+// json-error-recovery
+// delegate-task-retry
+// prometheus-md-only
+// sisyphus-junior-notepad
+// no-sisyphus-gpt
+// no-hephaestus-non-gpt
+// start-work
+// atlas
+// unstable-agent-babysitter
+// task-resume-info
+// stop-continuation-guard
+// tasks-todowrite-disabler
+// runtime-fallback
+// write-existing-file-guard
+// anthropic-effort
+// hashline-read-enhancer
+

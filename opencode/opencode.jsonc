@@ -1,0 +1,255 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": true,
+  "permission": "allow",
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 10000
+  },
+  "provider": {
+    "claude-newapi": {
+      "npm": "@ai-sdk/anthropic",
+      "options": {
+        "baseURL": "API_URL_",
+        "apiKey": "API_KEY_"
+      },
+      "models": {
+        "claude-opus-4-8": {
+          "name": "Claude Opus 4.8",
+          "limit": {
+            "context": 1000000,
+            "input": 900000,
+            "output": 100000
+          },
+          "variants": {
+            "low": {
+              "thinking": { "type": "adaptive" },
+              "effort": "low"
+            },
+            "max": {
+              "thinking": { "type": "adaptive", "display": "summarized" },
+              "effort": "max"
+            }
+          }
+        },
+        "claude-sonnet-4-6": {
+          "name": "Claude Sonnet 4.6",
+          "limit": {
+            "context": 1000000,
+            "input": 900000,
+            "output": 100000
+          },
+          "variants": {
+            "low": {
+              "thinking": { "type": "adaptive" },
+              "effort": "low"
+            },
+            "max": {
+              "thinking": { "type": "adaptive", "display": "summarized" },
+              "effort": "max"
+            }
+          }
+        }
+      }
+    },
+    "codex-newapi": {
+      "npm": "@ai-sdk/openai",
+      "options": {
+        "baseURL": "API_URL_",
+        "apiKey": "API_KEY_",
+        "setCacheKey": true,
+      },
+      "models": {
+        "gpt-5.4": {
+          "name": "GPT 5.4",
+          "limit": {
+            "context": 1000000,
+            "input": 900000,
+            "output": 100000
+          },
+          "options": {
+            "store": false
+          },
+          "variants": {
+            "low": {"reasoningEffort": "low"},
+            "medium": {"reasoningEffort": "medium"},
+            "high": {"reasoningEffort": "high"},
+            "xhigh": {"reasoningEffort": "xhigh"},
+          }
+        },
+        "gpt-5.5": {
+          "name": "GPT 5.5",
+          "limit": {
+            "context": 400000,
+            "input": 258000,
+            "output": 32000
+          },
+          "options": {
+            "store": false
+          },
+          "variants": {
+            "low": {"reasoningEffort": "low"},
+            "medium": {"reasoningEffort": "medium"},
+            "high": {"reasoningEffort": "high"},
+            "xhigh": {"reasoningEffort": "xhigh"},
+          }
+        }
+      }
+    },
+    "anthropic-newapi": {
+      "npm": "@ai-sdk/anthropic",
+      "options": {
+        "baseURL": "API_URL_",
+        "apiKey": "API_KEY_"
+      }
+      "models": {
+        "minimax-latest": {
+          "name": "minimax latest",
+          "limit": {
+            "context": 1000000,
+            "input": 900000,
+            "output": 100000
+          },
+          "variants": {
+            "low": {
+              "thinking": { "type": "adaptive" },
+              "effort": "low"
+            },
+            "max": {
+              "thinking": { "type": "adaptive", "display": "summarized" },
+              "effort": "max"
+            }
+          }
+        },
+        "glm-latest": {
+          "name": "glm latest",
+          "limit": {
+            "context": 200000,
+            "input": 160000,
+            "output": 32000
+          },
+          "variants": {
+            "low": {
+              "thinking": { "type": "adaptive" },
+              "effort": "low"
+            },
+            "max": {
+              "thinking": { "type": "adaptive", "display": "summarized" },
+              "effort": "max"
+            }
+          }
+
+        },
+        "kimi-latest": {
+          "name": "kimi latest",
+          "limit": {
+            "context": 200000,
+            "input": 160000,
+            "output": 32000
+          },
+          "variants": {
+            "low": {
+              "thinking": { "type": "adaptive" },
+              "effort": "low"
+            },
+            "max": {
+              "thinking": { "type": "adaptive", "display": "summarized" },
+              "effort": "max"
+            }
+          }
+        },
+        "deepseek-v4-pro": {
+          "name": "deepseek v4 pro",
+          "limit": {
+            "context": 1000000,
+            "input": 900000,
+            "output": 100000
+          },
+          "variants": {
+            "low": {
+              "thinking": { "type": "adaptive" },
+              "effort": "low"
+            },
+            "max": {
+              "thinking": { "type": "adaptive", "display": "summarized" },
+              "effort": "max"
+            }
+          }
+
+        },
+        "mimo-latest": {
+          "name": "mimo latest",
+          "limit": {
+            "context": 1000000,
+            "input": 900000,
+            "output": 100000
+          },
+          "variants": {
+            "low": {
+              "thinking": { "type": "adaptive" },
+              "effort": "low"
+            },
+            "max": {
+              "thinking": { "type": "adaptive", "display": "summarized" },
+              "effort": "max"
+            }
+          }
+
+        },
+        "qwen-latest": {
+          "name": "qwen latest",
+          "limit": {
+            "context": 1000000,
+            "input": 900000,
+            "output": 100000
+          },
+          "variants": {
+            "low": {
+              "thinking": { "type": "adaptive" },
+              "effort": "low"
+            },
+            "max": {
+              "thinking": { "type": "adaptive", "display": "summarized" },
+              "effort": "max"
+            }
+          }
+
+        }
+      },
+    }
+  },
+  "agent": {
+    "explore": {
+      "model": "anthropic-newapi/mimo-latest",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "write": false,
+        "edit": false,
+      }
+    },
+    "general": {
+      "model": "anthropic-newapi/kimi-latest",
+      "tools": {
+        "read": true,
+        "grep": true,
+        "glob": true,
+        "write": true,
+        "edit": true,
+      }
+    }
+  },
+  "mcp": {
+    "mcphub-web": {
+      "type": "remote",
+      "url": "MCP_URL_"
+    },
+  },
+  "snapshot": false,
+  "plugin": [
+    // "oh-my-opencode@latest"
+    "superpowers@git+https://github.com/obra/superpowers.git"
+  ]
+}

@@ -337,8 +337,6 @@ tmux_conf_copy_to_os_clipboard=true
 # -- user customizations -------------------------------------------------------
 # this is the place to override or undo settings
 
-# increase history size
-#set -g history-limit 10000
 
 # start with mouse mode enabled
 #set -g mouse on
@@ -375,9 +373,8 @@ setw -g monitor-activity on
 setw -g mode-keys vi    
 set -g visual-activity on
 ### disable mouse
-set -g mouse off
+set -g mouse on
 ### set history limit
-set-option -g history-limit 5000
 set-option -g status-keys vi                         
 
 # bind r source-file ~/.tmux.conf \; display "Reloaded!"
@@ -414,6 +411,8 @@ bind W new-window
 # copy mode
 bind Escape copy-mode # enter copy mode (prefix Escape)
 bind ^p pasteb        # paste buffer (prefix Ctrl+p)
+
+
 
 # i cannot make Ctrl+\ work as expected within tmux
 # bind -n 'C-\' run "(tmux display-message -p '#{pane_current_command}' | grep -iq vim && tmux send-keys 'C-\\') || tmux select-pane -l"
@@ -512,8 +511,6 @@ set -g @plugin 'christoomey/vim-tmux-navigator'
 
 # onedark theme
 set -g @plugin 'odedlaz/tmux-onedark-theme'
-# use y to yank
-set -g @plugin 'tmux-plugins/tmux-yank'
 
 # prefix + ^s = save current session
 # prefix + ^r = restore last session
@@ -554,3 +551,41 @@ set -g @plugin 'tmux-plugins/tmux-copycat'
 #
 # "$@"
 # # /!\ do not remove the previous line
+
+
+
+
+# ==================== 在 ~/.tmux.conf.local 中添加 ====================
+
+# 开启鼠标和 Vi 模式
+set -g mouse on
+set -g mode-keys vi
+
+# --------------- 鼠标拖选：复制但不退出复制模式 ---------------
+bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe "xclip -in -selection clipboard"
+bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe "xclip -in -selection clipboard"
+
+# --------------- 键盘操作 ---------------
+# v: 开始选择
+bind-key -T copy-mode-vi v send-keys -X begin-selection
+
+# C-v: 矩形选择
+bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
+
+# y: 复制但不退出（可以继续浏览和复制）
+bind-key -T copy-mode-vi y send-keys -X copy-pipe "xclip -in -selection clipboard"
+
+# Y: 复制并退出（如果你想要这个行为）
+bind-key -T copy-mode-vi Y send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard"
+
+# Enter: 复制并退出（传统行为）
+bind-key -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard"
+
+# Escape 或 q: 退出复制模式
+bind-key -T copy-mode-vi Escape send-keys -X cancel
+bind-key -T copy-mode-vi q send-keys -X cancel
+
+# --------------- 鼠标中键粘贴 ---------------
+bind-key -n MouseDown2Pane run "tmux set-buffer \"$(xclip -o -selection clipboard)\"; tmux paste-buffer"
+
+set -g history-limit 50000
