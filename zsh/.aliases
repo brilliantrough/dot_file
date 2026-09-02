@@ -8,13 +8,6 @@ alias "n=nvim"
 
 alias "xo=xdg-open"
 
-alias "trans=~/miniconda3/envs/learning/bin/python ~/Linewrite/Python/Source_code/google-translate/select-trans.py"
-alias "chat=~/miniconda3/envs/learning/bin/python ~/widget/chatbot/chatbot.py"
-alias "condade=conda deactivate"
-alias "condac=conda activate"
-alias "tm=tmux"
-alias "npt=cd /home/pzy000/Linewrite/Python/Project/qt/not-powerful-translator; nohup /home/pzy000/miniconda3/envs/npt/bin/python mainwindow.py > /dev/null 2>&1 &; cd -"
-
 alias b='cd ..'
 alias bb='cd ../..'
 alias bbb='cd ../../..'
@@ -26,6 +19,3 @@ alias mkdir='mkdir -p'
 alias df='df -h'
 alias xo='xdg-open'
 
-alias myget='python /home/pzy000/Linewrite/Python/Source_code/download_dataset/download_url.py -i'
-alias opencode='source envs.sh && opencode'
-alias claude='source envs.sh && claude'

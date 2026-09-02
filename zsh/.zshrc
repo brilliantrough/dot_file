@@ -126,17 +126,14 @@ export NVM_DIR="$HOME/.nvm"
 FNM_PATH="$HOME/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
-  eval "`fnm env`"
+  eval "$(fnm env --shell zsh)"
 fi
 
 autoload -Uz compinit
-compinit
-
-# OpenClaw Completion(存在才 source;路径用 $HOME,root 等其他用户不误报)
-[ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
+compinit -u
 
 # opencode
-export PATH=/home/pzy000/.opencode/bin:$PATH
+export PATH=$HOME/.opencode/bin:$PATH
 
 # bun completions
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
@@ -159,3 +156,6 @@ function y() {
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 
 export YDOTOOL_SOCKET="$HOME/.ydotool_socket"
+
+bindkey '^O' forward-char
+bindkey '^U' forward-word
