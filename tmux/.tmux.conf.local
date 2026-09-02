@@ -379,17 +379,6 @@ set-option -g status-keys vi
 
 # bind r source-file ~/.tmux.conf \; display "Reloaded!"
 
-#-- bindkeys --#
-# prefix key
-set -g prefix ^x
-# set -g prefix C-x
-# set -g prefix M-x
-# unbind ^b
-unbind ^b
-bind ^x send-prefix
-# bind C-x send-prefix
-# bind M-x send-prefix
-
 # split window
 # vertical split (prefix -)
 unbind '"'
