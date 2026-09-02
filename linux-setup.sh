@@ -65,26 +65,30 @@ if [ -n "$missing" ]; then
 fi
 
 # ---- 2. oh-my-zsh ----
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-  if ask "安装 oh-my-zsh?(--unattended,并把默认 shell 切到 zsh)"; then
-    # mktemp 而非固定 /tmp 路径:fs.protected_regular=2 时,粘滞目录(/tmp)里
-    # 改写他人属主的已存在文件会 EACCES,root 也不豁免;临时文件属主必是自己
-    omz_install="$(mktemp)"
-    # raw.githubusercontent.com 被墙时回退官方镜像 install.ohmyz.sh(README 推荐)
-    dlto https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh "$omz_install" 2>/dev/null \
-      || dlto https://install.ohmyz.sh/ "$omz_install"
-    # ZSH 显式指定:防止继承环境里已有的 ZSH 变量指去别处
-    ZSH="$HOME/.oh-my-zsh" sh "$omz_install" --unattended
-    rm -f "$omz_install"
-    chsh -s "$(command -v zsh)" 2>/dev/null || echo "chsh 未完成(可能需要密码),可手动: chsh -s \$(which zsh)"
-  fi
+if [ -d "$HOME/.oh-my-zsh" ]; then
+  echo "oh-my-zsh 已存在,跳过安装"
+elif ask "安装 oh-my-zsh?(--unattended,并把默认 shell 切到 zsh)"; then
+  # mktemp 而非固定 /tmp 路径:fs.protected_regular=2 时,粘滞目录(/tmp)里
+  # 改写他人属主的已存在文件会 EACCES,root 也不豁免;临时文件属主必是自己
+  omz_install="$(mktemp)"
+  # raw.githubusercontent.com 被墙时回退官方镜像 install.ohmyz.sh(README 推荐)
+  dlto https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh "$omz_install" 2>/dev/null \
+    || dlto https://install.ohmyz.sh/ "$omz_install"
+  # ZSH 显式指定:防止继承环境里已有的 ZSH 变量指去别处
+  ZSH="$HOME/.oh-my-zsh" sh "$omz_install" --unattended
+  rm -f "$omz_install"
+  chsh -s "$(command -v zsh)" 2>/dev/null || echo "chsh 未完成(可能需要密码),可手动: chsh -s \$(which zsh)"
 fi
 
 # ---- 3. omz 插件 ----
 if [ -d "$HOME/.oh-my-zsh/custom/plugins" ]; then
   for repo in zsh-users/zsh-syntax-highlighting zsh-users/zsh-autosuggestions; do
     dest="$HOME/.oh-my-zsh/custom/plugins/${repo##*/}"
-    [ -d "$dest" ] || git clone --depth=1 "https://github.com/$repo.git" "$dest"
+    if [ -d "$dest" ]; then
+      echo "插件已存在,跳过: ${dest##*/}"
+    else
+      git clone --depth=1 "https://github.com/$repo.git" "$dest"
+    fi
   done
 fi
 
