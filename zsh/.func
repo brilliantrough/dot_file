@@ -1,289 +1,86 @@
+# ~/.func — 工具函数,由 ~/.zshrc 自动 source
+
+# ---- proxy ----
 setproxy() {
-  export http_proxy="http://localhost:7890"
-  export https_proxy="http://localhost:7890"
-  export all_proxy="http://localhost:7890"
-  export HTTP_PROXY="http://localhost:7890"
-  export HTTPS_PROXY="http://localhost:7890"
-  export ALL_PROXY="http://localhost:7890"
-  export NO_PROXY="localhost,127.0.0.1"
+  local p="http://localhost:7890"
+  export http_proxy=$p https_proxy=$p all_proxy=$p \
+         HTTP_PROXY=$p HTTPS_PROXY=$p ALL_PROXY=$p \
+         NO_PROXY="localhost,127.0.0.1"
 }
 
-set_claude_env () {
+initproxy() {
+  unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY NO_PROXY
+}
+
+# ---- env ----
+set_claude_env() {
   export ANTHROPIC_BASE_URL="https://<YOUR_GATEWAY_HOST>/claude"
   export ANTHROPIC_AUTH_TOKEN="<YOUR_ANTHROPIC_AUTH_TOKEN>"
   unset ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL ANTHROPIC_DEFAULT_HAIKU_MODEL
 }
 
-initproxy() {
-  unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-}
-
-
-search_file () {
-	if [ $# -lt 2 ]
-	then
-		echo "Usage: search_file <directory> <search_term> [excluded_dirs...]"
-		echo "Example: search_file /path/to/directory 'AppImage' .venv node_modules"
-		return 1
-	fi
-	local directory="$1" 
-	local search_term="$2" 
-	shift 2
-	if [ ! -d "$directory" ]
-	then
-		echo "Error: Directory '$directory' does not exist."
-		return 1
-	fi
-	local find_params=()
-	find_params+=("$directory" -type f)
-	for excluded_dir in "$@"
-	do
-		find_params+=(-not -path "*/$excluded_dir/*")
-	done
-	# 使用grep对搜索结果进行过滤
-	find "${find_params[@]}" | grep "$search_term" | while IFS= read -r file
-	do
-		local relative_path="${file#$directory/}" 
-		local size=$(du -h "$file" | cut -f1)
-		# 使用ANSI编码给文件名中匹配的部分加颜色
-		local highlighted_path=$(echo "$relative_path" | sed "s/$search_term/\x1b[31m&\x1b[0m/g")
-		echo -e "$highlighted_path \033[32m$size\033[0m bytes"
-	done
+# ---- search / process / port ----
+search_file() {
+  [ $# -lt 2 ] && { echo "Usage: search_file <dir> <term> [exclude_dir...]"; return 1; }
+  local dir="$1" term="$2"; shift 2
+  local excl=() d
+  for d in "$@"; do excl+=(-not -path "*/$d/*"); done
+  find "$dir" -type f "${excl[@]}" | grep "$term" | xargs -r -d '\n' du -h
 }
 
 mykill() {
-  kill -9 $(ps -ef | grep "$1" | egrep -v -E "grep|mykill" | awk "{print \$2}")
+  local p
+  p=$(pgrep -f "$1") && kill -9 $p
 }
 
-find_process () {
-        if [ -z "$1" ]
-        then
-                echo "Usage: find_process <pattern>"
-                return 1
-        fi
-        PATTERN="$1" 
-        SCRIPT_PID=$$ 
-        PROCESS_LIST=$(ps -ef | grep -i "$PATTERN" | grep -v "grep" | grep -v "$SCRIPT_PID") 
-        if [ -z "$PROCESS_LIST" ]
-        then
-                echo "No processes matching '$PATTERN' found."
-                return 1
-        fi
-        echo "Found processes matching '$PATTERN':"
-        echo "----------------------------------------"
-        TEMP_FILE=$(mktemp) 
-        echo "$PROCESS_LIST" > "$TEMP_FILE"
-        COUNT=$(wc -l < "$TEMP_FILE") 
-        while IFS= read -r line
-        do
-                PID=$(echo "$line" | awk '{print $2}') 
-                PARENT_PID=$(echo "$line" | awk '{print $3}') 
-                USER=$(echo "$line" | awk '{print $1}') 
-                CMD=$(echo "$line" | awk '{for(i=8;i<=NF;i++) printf "%s ", $i}') 
-                START_TIME=$(ps -p $PID -o lstart= 2>/dev/null || echo "N/A") 
-                ELAPSED_TIME=$(ps -p $PID -o etime= 2>/dev/null || echo "N/A") 
-                CPU_TIME=$(ps -p $PID -o time= 2>/dev/null || echo "N/A") 
-                echo "PID: $PID (Parent: $PARENT_PID)"
-                echo "User: $USER"
-                echo "CPU%: $(ps -p $PID -o %cpu= 2>/dev/null || echo "N/A")"
-                echo "MEM%: $(ps -p $PID -o %mem= 2>/dev/null || echo "N/A")"
-                echo "Start Time: $START_TIME"
-                echo "Running Time: $ELAPSED_TIME"
-                echo "CPU Time: $CPU_TIME"
-                echo "Command: $CMD"
-                echo "----------------------------------------"
-        done < "$TEMP_FILE"
-        rm -f "$TEMP_FILE"
-        echo "Total: $COUNT process(es) found"
+find_process() {
+  [ -z "$1" ] && { echo "Usage: find_process <pattern>"; return 1; }
+  pgrep -af "$1"
 }
 
 check_port() {
-  #!/bin/bash
-
-  # 检查用户是否提供了端口号
-  if [ -z "$1" ]; then
-    echo "Usage: $0 <port>"
-    exit 1
-  fi
-
-  PORT=$1
-
-  # 使用 ss 命令查找指定端口的进程信息，并提取唯一的 PID 列表
-  PIDS=$(sudo ss -tulnp | grep ":$PORT " | awk '{print $NF}' | awk -F',' '{print $2}' | awk -F'=' '{print $2}' | sort -u)
-
-  if [ -z "$PIDS" ]; then
-    echo "No process is listening on port $PORT"
-  fi
-
-  # 遍历每个唯一的 PID
-  for PID in $PIDS; do
-    # 检查 PID 是否为数字
-    if ! [[ "$PID" =~ ^[0-9]+$ ]]; then
-      echo "Failed to extract a valid PID for port $PORT"
-      continue
-    fi
-
-    # 使用 ps 命令获取命令信息
-    INFO=$(ps -p "$PID" -o user=,etime=,lstart=,cmd=)
-
-    # 输出结果
-    echo "Port $PORT is being used by process:"
-    echo "PID: $PID"
-    echo "User: $(echo "$INFO" | awk '{print $1}')"
-    echo "Elapsed Time: $(echo "$INFO" | awk '{print $2}')"
-    echo "Start Time: $(echo "$INFO" | awk '{print $3, $4, $5, $6, $7}')"
-    echo "Command: $(echo "$INFO" | awk '{for (i=8; i<=NF; i++) printf "%s ", $i; print ""}')"
-    echo
-  done
+  [ -z "$1" ] && { echo "Usage: check_port <port>"; return 1; }
+  local pids p
+  pids=$(sudo ss -tulnp | grep ":$1 " | grep -o 'pid=[0-9]*' | cut -d= -f2 | sort -u)
+  [ -z "$pids" ] && { echo "no process listening on port $1"; return 0; }
+  for p in $pids; do ps -p "$p" -o pid=,user=,etime=,cmd=; done
 }
 
-# 将此函数添加到你的 ~/.bashrc 或 ~/.zshrc 文件中
+# ---- wait ----
 wait_on_command() {
-    if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
-        echo "❌ 错误: 参数数量不正确。"
-        echo "用法: wait_on_command \"<监控关键字>\" [\"<启动命令>\"]"
-        return 1
-    fi
-
-    local TARGET_KEYWORD="$1"
-    local START_COMMAND="$2"
-
-    echo "🔍 (函数) 开始监控关键字: '$TARGET_KEYWORD'"
-
-    if ! pgrep -f "$TARGET_KEYWORD" > /dev/null; then
-        echo "🟡 (函数) 关键字为 '$TARGET_KEYWORD' 的进程当前没有运行。"
-        if [ -n "$START_COMMAND" ]; then
-            echo "🚀 (函数) 根据提供的命令，准备启动..."
-            eval "$START_COMMAND" &
-            local SCRIPT_PID=$!
-            echo "✅ (函数) 命令已启动，PID: $SCRIPT_PID"
-            sleep 3
-        else
-            echo "ℹ️ (函数) 未提供启动命令，将直接返回。"
-            echo "✅ (函数) 任务完成。"
-            return 0
-        fi
-    fi
-
-    echo "⏳ (函数) 正在监控中，等待进程执行完毕..."
-    while pgrep -f "$TARGET_KEYWORD" > /dev/null; do
-        local PIDS
-        PIDS=$(pgrep -f "$TARGET_KEYWORD" | tr '\n' ' ')
-        echo "$(date +"%Y-%m-%d %H:%M:%S"): 进程仍在运行中... (PID: $PIDS)"
-        sleep 60
-    done
-
-    echo "🎉 $(date +"%Y-%m-%d %H:%M:%S"): 目标进程已执行完毕！"
-    return 0
-}
-# === Ubuntu KDE System Refresh Tool ===
-function kde_refresh() {
-    # 用法:
-    #   kde_refresh        → 默认 Level 1，最温柔，Electron 安全
-    #   kde_refresh 2      → Level 2，kwin --replace
-    #   kde_refresh 3      → Level 3，包含 plasmashell，有崩溃风险
-    local _level="${1:-1}"
-
-    echo "\n🚀 \033[1;36m开始执行 KDE 系统级刷新 (Level ${_level})...\033[0m"
-
-    # ── 权限检查（仅 Level 2/3 需要） ─────────────────────
-    if [ "$_level" -ge 2 ] && ! sudo -v; then
-        echo "❌ \033[1;31m需要 sudo 权限，操作已取消。\033[0m"
-        return 1
-    fi
-
-    # ── [1/3] 同步磁盘（始终执行，安全无害） ─────────────
-    echo -n "💾 [1/3] 正在同步磁盘数据 (sync)... "
-    sync
-    echo "\033[1;32m完成\033[0m"
-
-    # ── [2/3] 清理缓存（Level 2/3 才执行，避免不必要的 IO 抖动） ──
-    if [ "$_level" -ge 2 ]; then
-        echo -n "🧹 [2/3] 正在清理内核页缓存... "
-        # 用 1 代替 3：只清 page cache，保留 dentry/inode，更温和
-        if sudo sh -c 'echo 1 > /proc/sys/vm/drop_caches'; then
-            echo "\033[1;32m完成\033[0m"
-        else
-            echo "\033[1;31m失败\033[0m"
-        fi
-    else
-        echo "🧹 [2/3] \033[0;90mLevel 1 跳过内核缓存清理\033[0m"
-    fi
-
-    # ── [3/3] KDE 组件刷新（核心） ────────────────────────
-    echo "🖼  [3/3] 正在刷新 KDE 渲染层..."
-
-    case "$_level" in
-
-        1)  # ✅ 最安全：纯 D-Bus 指令，零进程重启
-            echo -n "    🔄 切换合成器 (suspend/resume)... "
-            if qdbus org.kde.KWin /Compositor suspend 2>/dev/null \
-            && sleep 0.8 \
-            && qdbus org.kde.KWin /Compositor resume 2>/dev/null; then
-                echo "\033[1;32m完成 ✓\033[0m"
-            else
-                # 备用：reconfigure 指令
-                echo -n "\033[1;33m (compositor toggle 不可用，尝试 reconfigure)... \033[0m"
-                if qdbus org.kde.KWin /KWin reconfigure 2>/dev/null; then
-                    echo "\033[1;32m完成 ✓\033[0m"
-                else
-                    echo "\033[1;31m失败，请尝试 kde_refresh 2\033[0m"
-                fi
-            fi
-            ;;
-
-        2)  # ⚠️  中等：kwin --replace，比 systemctl restart 更安全
-            _kde_check_electron_warn
-            echo -n "    🔄 KWin 热替换 (--replace)... "
-            if systemctl --user is-active --quiet plasma-kwin_wayland.service; then
-                kwin_wayland --replace > /dev/null 2>&1 &
-            else
-                kwin_x11 --replace > /dev/null 2>&1 &
-            fi
-            sleep 2
-            echo "\033[1;32m完成 ✓\033[0m"
-            ;;
-
-        3)  # ❌ 危险：会影响 Electron，非必要不用
-            _kde_check_electron_warn
-            echo -n "    🔄 KWin 热替换... "
-            if systemctl --user is-active --quiet plasma-kwin_wayland.service; then
-                kwin_wayland --replace > /dev/null 2>&1 &
-            else
-                kwin_x11 --replace > /dev/null 2>&1 &
-            fi
-            sleep 2
-            echo "\033[1;32m完成\033[0m"
-
-            echo -n "    🖥  Plasma Shell 热替换 (⚠️  Electron 有崩溃风险)... "
-            plasmashell --replace > /dev/null 2>&1 &
-            sleep 3
-            echo "\033[1;32m完成\033[0m"
-            ;;
-
-        *)
-            echo "❌ \033[1;31m无效的 Level，请使用 1、2 或 3\033[0m"
-            return 1
-            ;;
-    esac
-
-    echo "\n✨ \033[1;36m系统刷新完毕！Enjoy your fresh KDE!\033[0m ✨\n"
+  if [ $# -lt 1 ] || [ $# -gt 2 ]; then echo "Usage: wait_on_command <keyword> [start_command]"; return 1; fi
+  if ! pgrep -f "$1" >/dev/null; then
+    [ -z "$2" ] && { echo "not running: $1"; return 0; }
+    eval "$2" &
+    sleep 3
+  fi
+  while pgrep -f "$1" >/dev/null; do
+    echo "$(date '+%F %T') still running: $1"
+    sleep 60
+  done
+  echo "$(date '+%F %T') done: $1"
 }
 
-# ── 内部辅助函数：Electron 进程警告 ──────────────────────────
-_kde_check_electron_warn() {
-    local _procs=("code" "electron" "siyuan" "notion" "obsidian" "slack" "discord")
-    local _running=()
-    for _p in "${_procs[@]}"; do
-        pgrep -x "$_p" > /dev/null 2>&1 && _running+=("$_p")
-    done
-    if [ ${#_running[@]} -gt 0 ]; then
-        echo "⚠️  \033[1;33m检测到 Electron 应用: ${_running[*]}\033[0m"
-        echo -n "    当前 Level 可能导致它们崩溃，继续？[y/N] "
-        read -r _ans
-        case "$_ans" in
-            [yY]) ;;
-            *) echo "\033[1;31m已取消。\033[0m"; return 1 ;;
-        esac
-    fi
+# ---- kde ----
+# kde_refresh [1|2|3]: 1=合成器 suspend/resume(最安全) 2=kwin --replace 3=再加 plasmashell(2/3 可能崩 Electron)
+kde_refresh() {
+  local l="${1:-1}" kwin a
+  case "$l" in
+    1)
+      qdbus org.kde.KWin /Compositor suspend && sleep 0.8 && qdbus org.kde.KWin /Compositor resume \
+        || qdbus org.kde.KWin /KWin reconfigure
+      ;;
+    2|3)
+      pgrep -x 'code|electron|siyuan|notion|obsidian|slack|discord' >/dev/null && {
+        echo "Electron 应用在运行,Level $l 可能使其崩溃,继续?[y/N]"
+        read -r a
+        [[ "$a" =~ ^[yY]$ ]] || return 1
+      }
+      kwin=kwin_x11
+      systemctl --user is-active --quiet plasma-kwin_wayland.service && kwin=kwin_wayland
+      "$kwin" --replace >/dev/null 2>&1 &
+      [ "$l" = 3 ] && { sleep 2; plasmashell --replace >/dev/null 2>&1 & }
+      ;;
+    *) echo "Usage: kde_refresh [1|2|3]"; return 1 ;;
+  esac
 }
