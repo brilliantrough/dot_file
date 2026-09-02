@@ -16,7 +16,14 @@ set -euo pipefail
 
 RAW="https://raw.githubusercontent.com/brilliantrough/dot_file/master"
 
-ask() { local a; read -r -p "$1 [y/N] " a; [[ "$a" =~ ^[Yy]$ ]]; }
+ask() { # 读 /dev/tty:curl|bash 时 stdin 是脚本管道,绝不能从 stdin 读,否则会吞掉脚本行
+  local a=""
+  if { [ -t 0 ] || [ -e /dev/tty ]; } && read -r -p "$1 [y/N] " a < /dev/tty 2>/dev/null; then
+    [[ "$a" =~ ^[Yy]$ ]]
+  else
+    false  # 非交互环境一律默认否
+  fi
+}
 dlto() { # $1=url $2=dest(wget 优先,curl 兜底,均遵循 http(s)_proxy)
   if command -v wget >/dev/null 2>&1; then wget -qO "$2" "$1"; else curl -fsSL -o "$2" "$1"; fi
 }
@@ -51,8 +58,7 @@ if [ -n "$missing" ]; then
   if ask "缺少系统包:$missing。用 apt-get 安装?(含 ca-certificates)"; then
     sudo apt-get update
     # shellcheck disable=SC2086
-    sudo apt-get install -y $missing ca-certificates
-  else
+    sudo apt-get install -y $missing ca-certificates  else
     echo "跳过安装;后续步骤可能失败"
   fi
 fi
@@ -60,9 +66,11 @@ fi
 # ---- 2. oh-my-zsh ----
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   if ask "安装 oh-my-zsh?(--unattended,并把默认 shell 切到 zsh)"; then
-    dlto https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh /tmp/omz-install.sh
+    # raw.githubusercontent.com 被墙时回退官方镜像 install.ohmyz.sh(README 推荐)
+    dlto https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh /tmp/omz-install.sh 2>/dev/null \
+      || dlto https://install.ohmyz.sh/ /tmp/omz-install.sh
     # ZSH 显式指定:防止继承环境里已有的 ZSH 变量指去别处
-    ZSH="$HOME/.oh-my-zsh" RUNZSH=no sh /tmp/omz-install.sh --unattended
+    ZSH="$HOME/.oh-my-zsh" sh /tmp/omz-install.sh --unattended
     chsh -s "$(command -v zsh)" 2>/dev/null || echo "chsh 未完成(可能需要密码),可手动: chsh -s \$(which zsh)"
   fi
 fi
@@ -85,6 +93,6 @@ fetch tmux/.tmux.conf.local "$HOME/.tmux.conf.local"
 # ---- 完成 ----
 echo ""
 echo "== done. 注意事项 =="
-echo "1. ~/.func 含 <YOUR_*> 占位符(ANTHROPIC_AUTH_TOKEN、网关地址),填完 set_claude_env 才可用"
+echo "1. ~/.func 含 <YOUR_*> 占位符(已加引号,可直接 source;填真实值后 set_claude_env 才可用)"
 echo "2. exec zsh 或重新登录生效;.zshrc 会自动 source ~/.aliases 和 ~/.func"
 echo "3. opencode 三件套(claude-mem/magic-context/ponytail/notify): 用 brilliantrough/agent-skills 仓库的 opencode-setup.sh"
