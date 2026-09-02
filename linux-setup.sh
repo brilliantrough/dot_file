@@ -31,6 +31,10 @@ dlto() { # $1=url $2=dest(wget 优先,curl 兜底,均遵循 http(s)_proxy)
 # fetch <repo相对路径> <目标绝对路径> — 已存在征求覆盖(.bak 备份)
 fetch() {
   local dest="$2"
+  if [ -L "$dest" ]; then
+    echo "跳过: $dest 是符号链接(指向 $(readlink "$dest")),不覆盖以免破坏链接目标"
+    return 0
+  fi
   if [ -f "$dest" ]; then
     ask "$dest 已存在,用 dot_file 仓库版本覆盖?(原文件存为 $dest.bak)" || return 0
     cp "$dest" "$dest.bak"
