@@ -60,7 +60,9 @@ fi
 # ---- 2. oh-my-zsh ----
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   if ask "安装 oh-my-zsh?(--unattended,并把默认 shell 切到 zsh)"; then
-    RUNZSH=no sh -c "$(dlto https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh /tmp/omz-install.sh)" "" --unattended
+    dlto https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh /tmp/omz-install.sh
+    # ZSH 显式指定:防止继承环境里已有的 ZSH 变量指去别处
+    ZSH="$HOME/.oh-my-zsh" RUNZSH=no sh /tmp/omz-install.sh --unattended
     chsh -s "$(command -v zsh)" 2>/dev/null || echo "chsh 未完成(可能需要密码),可手动: chsh -s \$(which zsh)"
   fi
 fi
