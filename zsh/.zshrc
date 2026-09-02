@@ -123,7 +123,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # fnm
-FNM_PATH="/home/pzy000/.local/share/fnm"
+FNM_PATH="$HOME/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
   eval "`fnm env`"
@@ -132,14 +132,14 @@ fi
 autoload -Uz compinit
 compinit
 
-# OpenClaw Completion
-source "/home/pzy000/.openclaw/completions/openclaw.zsh"
+# OpenClaw Completion(存在才 source;路径用 $HOME,root 等其他用户不误报)
+[ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
 
 # opencode
 export PATH=/home/pzy000/.opencode/bin:$PATH
 
 # bun completions
-[ -s "/home/pzy000/.bun/_bun" ] && source "/home/pzy000/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
