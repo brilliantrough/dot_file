@@ -2,21 +2,17 @@
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": true,
   "permission": "allow",
-  "compaction": {
-    "auto": true,
-    "prune": true,
-    "reserved": 10000
-  },
+  "compaction": { "auto": false, "prune": false },
   "provider": {
     "claude-newapi": {
       "npm": "@ai-sdk/anthropic",
       "options": {
-        "baseURL": "API_URL_",
-        "apiKey": "API_KEY_"
+        "baseURL": "https://<YOUR_GATEWAY_HOST>/v1",
+        "apiKey": "<YOUR_NEWAPI_API_KEY>"
       },
       "models": {
-        "claude-opus-4-8": {
-          "name": "Claude Opus 4.8",
+        "claude-opus-5": {
+          "name": "Claude Opus 5",
           "limit": {
             "context": 1000000,
             "input": 900000,
@@ -33,56 +29,21 @@
             }
           }
         },
-        "claude-sonnet-4-6": {
-          "name": "Claude Sonnet 4.6",
-          "limit": {
-            "context": 1000000,
-            "input": 900000,
-            "output": 100000
-          },
-          "variants": {
-            "low": {
-              "thinking": { "type": "adaptive" },
-              "effort": "low"
-            },
-            "max": {
-              "thinking": { "type": "adaptive", "display": "summarized" },
-              "effort": "max"
-            }
-          }
-        }
       }
     },
     "codex-newapi": {
       "npm": "@ai-sdk/openai",
       "options": {
-        "baseURL": "API_URL_",
-        "apiKey": "API_KEY_",
+        "baseURL": "https://<YOUR_GATEWAY_HOST>/v1",
+        "apiKey": "<YOUR_NEWAPI_API_KEY>",
         "setCacheKey": true,
       },
       "models": {
-        "gpt-5.4": {
-          "name": "GPT 5.4",
-          "limit": {
-            "context": 1000000,
-            "input": 900000,
-            "output": 100000
-          },
-          "options": {
-            "store": false
-          },
-          "variants": {
-            "low": {"reasoningEffort": "low"},
-            "medium": {"reasoningEffort": "medium"},
-            "high": {"reasoningEffort": "high"},
-            "xhigh": {"reasoningEffort": "xhigh"},
-          }
-        },
         "gpt-5.5": {
           "name": "GPT 5.5",
           "limit": {
             "context": 400000,
-            "input": 258000,
+            "input": 272000,
             "output": 32000
           },
           "options": {
@@ -94,15 +55,42 @@
             "high": {"reasoningEffort": "high"},
             "xhigh": {"reasoningEffort": "xhigh"},
           }
-        }
+        },
+        "gpt-5.6-sol": {
+          "name": "GPT 5.6 Sol",
+          "limit": {
+            "context": 500000,
+            "input": 372000,
+            "output": 128000
+          },
+          "options": {
+            "store": false
+          },
+          "variants": {
+            "low": {"reasoningEffort": "low"},
+            "medium": {"reasoningEffort": "medium"},
+            "high": {"reasoningEffort": "high"},
+            "xhigh": {"reasoningEffort": "xhigh"},
+          }
+        },
+        "gpt-5.6-luna": {
+          "name": "GPT 5.6 Luna",
+          "limit": {
+            "context": 500000,
+            "input": 372000,
+            "output": 128000
+          },
+          "options": {
+            "store": false
+          },
+          "variants": {
+            "max": {"reasoningEffort": "max"},
+          }
+        },
       }
     },
     "anthropic-newapi": {
       "npm": "@ai-sdk/anthropic",
-      "options": {
-        "baseURL": "API_URL_",
-        "apiKey": "API_KEY_"
-      }
       "models": {
         "minimax-latest": {
           "name": "minimax latest",
@@ -144,9 +132,9 @@
         "kimi-latest": {
           "name": "kimi latest",
           "limit": {
-            "context": 200000,
-            "input": 160000,
-            "output": 32000
+            "context": 1000000,
+            "input": 600000,
+            "output": 400000
           },
           "variants": {
             "low": {
@@ -161,6 +149,25 @@
         },
         "deepseek-v4-pro": {
           "name": "deepseek v4 pro",
+          "limit": {
+            "context": 1000000,
+            "input": 900000,
+            "output": 100000
+          },
+          "variants": {
+            "low": {
+              "thinking": { "type": "adaptive" },
+              "effort": "low"
+            },
+            "max": {
+              "thinking": { "type": "adaptive", "display": "summarized" },
+              "effort": "max"
+            }
+          }
+
+        },
+        "deepseek-v4-flash": {
+          "name": "deepseek v4 flash",
           "limit": {
             "context": 1000000,
             "input": 900000,
@@ -217,11 +224,14 @@
 
         }
       },
+      "options": {
+        "baseURL": "https://<YOUR_GATEWAY_HOST>/v1"
+      }
     }
   },
   "agent": {
     "explore": {
-      "model": "anthropic-newapi/mimo-latest",
+      "model": "anthropic-newapi/deepseek-v4-flash",
       "tools": {
         "read": true,
         "grep": true,
@@ -231,7 +241,7 @@
       }
     },
     "general": {
-      "model": "anthropic-newapi/kimi-latest",
+      "model": "codex-newapi/gpt-5.6-luna",
       "tools": {
         "read": true,
         "grep": true,
@@ -244,12 +254,22 @@
   "mcp": {
     "mcphub-web": {
       "type": "remote",
-      "url": "MCP_URL_"
+      "url": "https://mcp.pezayo.com/mcp/web"
+    },
+    // claude-mem 查询工具组（search/timeline/get_observations/smart_* 等，当前版本 14 个）。
+    // 必须保留：插件本体（lib/claude-mem.js）只注册 hook 不带工具，MCP 是工具唯一来源。
+    // 注意：必须用 bun 运行（mcp-server.cjs 依赖 bun:sqlite，node 会崩）；
+    // 路径刻意用 marketplace 无版本号路径——npx 升级会原地覆盖该文件，配置无需跟随版本号变更。
+    "claude-mem": {
+      "type": "local",
+      "command": ["/home/pzy000/.bun/bin/bun", "/home/pzy000/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"],
+      "enabled": true
     },
   },
   "snapshot": false,
   "plugin": [
-    // "oh-my-opencode@latest"
-    "superpowers@git+https://github.com/obra/superpowers.git"
+    "@cortexkit/opencode-magic-context@latest",
+    "@dietrichgebert/ponytail",
+    "./plugins/claude-mem-wrapper.js"
   ]
 }

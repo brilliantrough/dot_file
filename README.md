@@ -29,6 +29,20 @@ cp -r lvim/* ~/.config/lvim/
 
 `/etc/proxychains.conf` 文件
 
+## zsh
+
+`.zshrc` 保持通用配置;个人函数、别名拆在 `.func` 和 `.aliases`,部署到 `~/.func`、`~/.aliases`,并在 `.zshrc` 中 source。
+
+## opencode
+
+`opencode/opencode.jsonc` → `~/.config/opencode/opencode.jsonc`
+
+`opencode/claude-mem.settings.json` → `~/.claude-mem/settings.json`
+
+`opencode/magic-context.jsonc` → `~/.config/cortexkit/magic-context.jsonc`
+
+敏感信息(key、网关地址)一律以 `<YOUR_*>` 占位符入库,部署时替换。
+
 ## python
 
 `.condarc` 文件

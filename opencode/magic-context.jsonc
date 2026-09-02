@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cortexkit/magic-context/master/assets/magic-context.schema.json",
+  "historian": {
+    "opencode": {
+      "model": "anthropic-newapi/deepseek-v4-flash"
+    }
+  },
+  "embedding": {
+    "provider": "openai-compatible",
+    "model": "text-embedding-3-large",
+    "endpoint": "https://<YOUR_GATEWAY_HOST>/v1",
+    "api_key": "<YOUR_API_KEY>"
+  },
+  "dreamer": {
+    "opencode": {
+      "model": "anthropic-newapi/deepseek-v4-flash"
+    }
+  },
+  "sidekick": {
+    "disable": true
+  }
+}
