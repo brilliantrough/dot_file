@@ -25,8 +25,8 @@ ask() { # 读 /dev/tty:curl|bash 时 stdin 是脚本管道,绝不能从 stdin �
     false  # 非交互环境一律默认否
   fi
 }
-dlto() { # $1=url $2=dest(wget 优先,curl 兜底,均遵循 http(s)_proxy)
-  if command -v wget >/dev/null 2>&1; then wget -qO "$2" "$1"; else curl -fsSL -o "$2" "$1"; fi
+dlto() { # $1=url $2=dest(wget 优先,curl 兜底,均遵循 http(s)_proxy);超时防代理抖动时无限静默等待
+  if command -v wget >/dev/null 2>&1; then wget -qT 30 -O "$2" "$1"; else curl -fsSL --connect-timeout 8 -m 60 -o "$2" "$1"; fi
 }
 # fetch <repo相对路径> <目标绝对路径> — 已存在征求覆盖(.bak 备份)
 fetch() {
