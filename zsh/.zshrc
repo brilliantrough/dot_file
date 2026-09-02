@@ -155,7 +155,7 @@ function y() {
     rm -f -- "$tmp"
 }
 
-# zoxide - smart cd command
-eval "$(zoxide init zsh)"
+# zoxide - smart cd command(未安装则跳过)
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
 
 export YDOTOOL_SOCKET="$HOME/.ydotool_socket"
