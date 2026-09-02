@@ -2,6 +2,14 @@
 
 此仓库用来存储 Linux 系统中的一些配置文件，通常这些配置文件都是以点开头的隐藏文件。
 
+## 一键配置
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/brilliantrough/dot_file/master/linux-setup.sh)"
+```
+
+安装 zsh、oh-my-zsh(含语法高亮/自动建议插件)、tmux,并部署 zsh 与 tmux 配置文件。国内网络建议先 `export http_proxy/https_proxy`。
+
 ## tmux
 
 `.tmux.conf` 和 `.tmux.conf.local` 文件
