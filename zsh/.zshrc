@@ -72,30 +72,15 @@ ZSH_THEME="clean"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git autojump zsh-autosuggestions zsh-syntax-highlighting tmux shell-proxy zsh-vi-mode)
+plugins=(git autojump zsh-autosuggestions zsh-syntax-highlighting tmux shell-proxy)
 
 fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
 source $ZSH/oh-my-zsh.sh
-zvm_after_init_commands+=(
-  'bindkey -M viins "^o" forward-char'
-  'bindkey -M vicmd "^o" forward-char'
-  'bindkey -M viins "^u" forward-word'
-  'bindkey -M vicmd "^u" forward-word'
-)
-# Your custom widget
-function my_custom_widget() {
-  echo 'Hello, ZSH!'
-}
 
-# The plugin will auto execute this zvm_after_lazy_keybindings function
-function zvm_after_lazy_keybindings() {
-  # Here we define the custom widget
-  zvm_define_widget my_custom_widget
-
-  # In normal mode, press Ctrl-E to invoke this widget
-  zvm_bindkey vicmd '^E' my_custom_widget
-  zvm_bindkey viins '^E' my_custom_widget
-}
+# Ctrl+O / Ctrl+W:逐字符/逐词接受 zsh-autosuggestions 的灰色补全
+# (沿用原 zsh-vi-mode 下 ^o=forward-char、^u=forward-word 的语义,行尾且有建议时即部分接受)
+bindkey '^O' forward-char
+bindkey '^W' forward-word
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
