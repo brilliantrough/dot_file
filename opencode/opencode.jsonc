@@ -91,6 +91,10 @@
     },
     "anthropic-newapi": {
       "npm": "@ai-sdk/anthropic",
+      "options": {
+        "baseURL": "https://<YOUR_GATEWAY_HOST>/v1",
+        "apiKey": "<YOUR_NEWAPI_API_KEY>"
+      },
       "models": {
         "minimax-latest": {
           "name": "minimax latest",
@@ -109,25 +113,6 @@
               "effort": "max"
             }
           }
-        },
-        "glm-latest": {
-          "name": "glm latest",
-          "limit": {
-            "context": 200000,
-            "input": 160000,
-            "output": 32000
-          },
-          "variants": {
-            "low": {
-              "thinking": { "type": "adaptive" },
-              "effort": "low"
-            },
-            "max": {
-              "thinking": { "type": "adaptive", "display": "summarized" },
-              "effort": "max"
-            }
-          }
-
         },
         "kimi-latest": {
           "name": "kimi latest",
@@ -164,7 +149,6 @@
               "effort": "max"
             }
           }
-
         },
         "deepseek-v4-flash": {
           "name": "deepseek v4 flash",
@@ -183,50 +167,8 @@
               "effort": "max"
             }
           }
-
         },
-        "mimo-latest": {
-          "name": "mimo latest",
-          "limit": {
-            "context": 1000000,
-            "input": 900000,
-            "output": 100000
-          },
-          "variants": {
-            "low": {
-              "thinking": { "type": "adaptive" },
-              "effort": "low"
-            },
-            "max": {
-              "thinking": { "type": "adaptive", "display": "summarized" },
-              "effort": "max"
-            }
-          }
-
-        },
-        "qwen-latest": {
-          "name": "qwen latest",
-          "limit": {
-            "context": 1000000,
-            "input": 900000,
-            "output": 100000
-          },
-          "variants": {
-            "low": {
-              "thinking": { "type": "adaptive" },
-              "effort": "low"
-            },
-            "max": {
-              "thinking": { "type": "adaptive", "display": "summarized" },
-              "effort": "max"
-            }
-          }
-
-        }
       },
-      "options": {
-        "baseURL": "https://<YOUR_GATEWAY_HOST>/v1"
-      }
     }
   },
   "agent": {
@@ -256,15 +198,7 @@
       "type": "remote",
       "url": "https://mcp.pezayo.com/mcp/web"
     },
-    // claude-mem 查询工具组（search/timeline/get_observations/smart_* 等，当前版本 14 个）。
-    // 必须保留：插件本体（lib/claude-mem.js）只注册 hook 不带工具，MCP 是工具唯一来源。
-    // 注意：必须用 bun 运行（mcp-server.cjs 依赖 bun:sqlite，node 会崩）；
-    // 路径刻意用 marketplace 无版本号路径——npx 升级会原地覆盖该文件，配置无需跟随版本号变更。
-    "claude-mem": {
-      "type": "local",
-      "command": ["/home/pzy000/.bun/bin/bun", "/home/pzy000/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs"],
-      "enabled": true
-    },
+    // claude-mem 的 MCP 条目不在此配置:由 opencode-setup.sh 按各机器家目录动态写入 opencode.json
   },
   "snapshot": false,
   "plugin": [
