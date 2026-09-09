@@ -39,12 +39,12 @@
         "setCacheKey": true,
       },
       "models": {
-        "gpt-5.5": {
-          "name": "GPT 5.5",
+        "gpt-6-astra": {
+          "name": "GPT 6 Astra",
           "limit": {
-            "context": 400000,
-            "input": 272000,
-            "output": 32000
+            "context": 500000,
+            "input": 372000,
+            "output": 128000
           },
           "options": {
             "store": false
