@@ -84,3 +84,8 @@ kde_refresh() {
     *) echo "Usage: kde_refresh [1|2|3]"; return 1 ;;
   esac
 }
+
+ocreload() {
+  curl -s -X POST "http://127.0.0.1:${OC_PORT:-5010}/instance/dispose?directory=${1:-$PWD}"
+  echo
+}
