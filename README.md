@@ -43,7 +43,7 @@ cp -r lvim/* ~/.config/lvim/
 
 ## opencode
 
-`opencode/opencode.jsonc` → `~/.config/opencode/opencode.jsonc`
+`opencode/opencode.json` → `~/.config/opencode/opencode.json`（脚本每次运行按模板覆盖各 provider 的 models,apiKey 等本地字段保留）
 
 `opencode/claude-mem.settings.json` → `~/.claude-mem/settings.json`
 

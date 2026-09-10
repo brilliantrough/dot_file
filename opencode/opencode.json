@@ -2,7 +2,10 @@
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": true,
   "permission": "allow",
-  "compaction": { "auto": false, "prune": false },
+  "compaction": {
+    "auto": false,
+    "prune": false
+  },
   "provider": {
     "claude-newapi": {
       "npm": "@ai-sdk/anthropic",
@@ -20,15 +23,20 @@
           },
           "variants": {
             "low": {
-              "thinking": { "type": "adaptive" },
+              "thinking": {
+                "type": "adaptive"
+              },
               "effort": "low"
             },
             "max": {
-              "thinking": { "type": "adaptive", "display": "summarized" },
+              "thinking": {
+                "type": "adaptive",
+                "display": "summarized"
+              },
               "effort": "max"
             }
           }
-        },
+        }
       }
     },
     "codex-newapi": {
@@ -36,7 +44,7 @@
       "options": {
         "baseURL": "https://<YOUR_GATEWAY_HOST>/v1",
         "apiKey": "<YOUR_NEWAPI_API_KEY>",
-        "setCacheKey": true,
+        "setCacheKey": true
       },
       "models": {
         "gpt-6-astra": {
@@ -50,10 +58,18 @@
             "store": false
           },
           "variants": {
-            "low": {"reasoningEffort": "low"},
-            "medium": {"reasoningEffort": "medium"},
-            "high": {"reasoningEffort": "high"},
-            "xhigh": {"reasoningEffort": "xhigh"},
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         },
         "gpt-5.6-sol": {
@@ -67,10 +83,18 @@
             "store": false
           },
           "variants": {
-            "low": {"reasoningEffort": "low"},
-            "medium": {"reasoningEffort": "medium"},
-            "high": {"reasoningEffort": "high"},
-            "xhigh": {"reasoningEffort": "xhigh"},
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
           }
         },
         "gpt-5.6-luna": {
@@ -84,9 +108,11 @@
             "store": false
           },
           "variants": {
-            "max": {"reasoningEffort": "max"},
+            "max": {
+              "reasoningEffort": "max"
+            }
           }
-        },
+        }
       }
     },
     "anthropic-newapi": {
@@ -105,11 +131,16 @@
           },
           "variants": {
             "low": {
-              "thinking": { "type": "adaptive" },
+              "thinking": {
+                "type": "adaptive"
+              },
               "effort": "low"
             },
             "max": {
-              "thinking": { "type": "adaptive", "display": "summarized" },
+              "thinking": {
+                "type": "adaptive",
+                "display": "summarized"
+              },
               "effort": "max"
             }
           }
@@ -123,11 +154,16 @@
           },
           "variants": {
             "low": {
-              "thinking": { "type": "adaptive" },
+              "thinking": {
+                "type": "adaptive"
+              },
               "effort": "low"
             },
             "max": {
-              "thinking": { "type": "adaptive", "display": "summarized" },
+              "thinking": {
+                "type": "adaptive",
+                "display": "summarized"
+              },
               "effort": "max"
             }
           }
@@ -141,20 +177,28 @@
           },
           "variants": {
             "low": {
-              "thinking": { "type": "enabled" },
+              "thinking": {
+                "type": "enabled"
+              },
               "effort": "low"
             },
             "high": {
-              "thinking": { "type": "enabled", "display": "summarized" },
+              "thinking": {
+                "type": "enabled",
+                "display": "summarized"
+              },
               "effort": "high"
-            }
+            },
             "max": {
-              "thinking": { "type": "enabled", "display": "summarized" },
+              "thinking": {
+                "type": "enabled",
+                "display": "summarized"
+              },
               "effort": "max"
             }
           }
-        },
-      },
+        }
+      }
     }
   },
   "agent": {
@@ -165,7 +209,7 @@
         "grep": true,
         "glob": true,
         "write": false,
-        "edit": false,
+        "edit": false
       }
     },
     "general": {
@@ -175,7 +219,7 @@
         "grep": true,
         "glob": true,
         "write": true,
-        "edit": true,
+        "edit": true
       }
     }
   },
@@ -183,8 +227,7 @@
     "mcphub-web": {
       "type": "remote",
       "url": "https://mcp.pezayo.com/mcp/web"
-    },
-    // claude-mem 的 MCP 条目不在此配置:由 opencode-setup.sh 按各机器家目录动态写入 opencode.json
+    }
   },
   "snapshot": false,
   "plugin": [
