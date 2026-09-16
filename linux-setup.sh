@@ -7,7 +7,8 @@
 #   0.5 提权检查:root 可直接跑;普通用户检测 sudo 免密,可选一键写入 /etc/sudoers.d 配置 NOPASSWD
 #   0.6 apt 源检查:仍是官方默认源则提醒换清华/南大镜像(不代改,只给网址)
 #   1. 系统包:zsh tmux git wget(必需)+ vim neovim autojump make python3-pip ca-certificates(可选,缺才装)
-#   1.5 用户级运行时:uv(+Python 3.9~3.13)、fnm(+Node LTS)、bun(无需 sudo;提前装好,opencode-setup.sh 即可直接通过)
+#   1.5 openssh:缺 sshd 则装 openssh-server 并尝试设为开机自启(部分发行版/镜像默认不装)
+#   1.6 用户级运行时:uv(+Python 3.9~3.13)、fnm(+Node LTS)、bun(无需 sudo;提前装好,opencode-setup.sh 即可直接通过)
 #   2. oh-my-zsh(--unattended) + 默认 shell 切 zsh
 #   3. omz 插件:zsh-syntax-highlighting、zsh-autosuggestions
 #   4. 配置文件:~/.zshrc ~/.aliases ~/.func ~/.tmux.conf ~/.tmux.conf.local ~/.condarc(清华源)
@@ -181,7 +182,34 @@ elif [ -n "$req$opt" ]; then
   fi
 fi
 
-# ---- 1.5 用户级运行时:uv / fnm(+Node LTS)/ bun(无需 sudo;opencode-setup.sh 依赖它们) ----
+# ---- 1.5 openssh(部分发行版/容器镜像默认不装服务端,缺 sshd 就无法远程登录)----
+ssh_pkgs=""
+[ -x /usr/sbin/sshd ] || command -v sshd >/dev/null 2>&1 || ssh_pkgs="openssh-server"
+command -v ssh >/dev/null 2>&1 || ssh_pkgs="$ssh_pkgs openssh-client"
+if [ -z "$ssh_pkgs" ]; then
+  echo "openssh 已存在(server + client)"
+elif [ "$can_install" -eq 0 ]; then
+  echo "跳过 openssh 安装(无提权),请手动安装:$ssh_pkgs"
+elif ask "未检测到:$ssh_pkgs。安装 openssh(sshd 会尝试设为开机自启)?"; then
+  # shellcheck disable=SC2086
+  if $SUDO apt-get install -y $ssh_pkgs; then
+    if [ -x /usr/sbin/sshd ] || command -v sshd >/dev/null 2>&1; then
+      if command -v systemctl >/dev/null 2>&1; then
+        # Debian/Ubuntu 单元名是 ssh,RHEL 系是 sshd,都试一遍
+        $SUDO systemctl enable --now ssh 2>/dev/null || $SUDO systemctl enable --now sshd 2>/dev/null \
+          || echo "WARN: openssh-server 已装,但 systemctl 起不来(容器内无 systemd 时需手动启 sshd)"
+      else
+        echo "openssh-server 已装(无 systemd,需自行启动 sshd)"
+      fi
+    fi
+  else
+    echo "WARN: openssh 安装失败"
+  fi
+else
+  echo "跳过 openssh 安装(用户拒绝);拿到 sudo 后可重跑"
+fi
+
+# ---- 1.6 用户级运行时:uv / fnm(+Node LTS)/ bun(无需 sudo;opencode-setup.sh 依赖它们) ----
 if command -v uv >/dev/null 2>&1 || [ -x "$HOME/.local/bin/uv" ]; then
   echo "uv 已存在,跳过"
 elif ask "安装 uv(python 包/项目管理器)?"; then
