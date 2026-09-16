@@ -48,18 +48,34 @@ run_installer() {
   fi
   rm -f "$tmp"
 }
-# fetch <repo相对路径> <目标绝对路径> — 已存在征求覆盖(.bak 备份)
-fetch() {
-  local dest="$2"
+# _commit <已下载临时文件> <目标> — 与现有内容相同则不动(幂等);不同才先存 .bak 再写
+_commit() {
+  local tmp="$1" dest="$2"
   if [ -L "$dest" ]; then
     echo "跳过: $dest 是符号链接(指向 $(readlink "$dest")),不覆盖以免破坏链接目标"
     return 0
   fi
-  if [ -f "$dest" ]; then
-    ask "$dest 已存在,用 dot_file 仓库版本覆盖?(原文件存为 $dest.bak)" || return 0
-    cp "$dest" "$dest.bak"
+  if [ -f "$dest" ] && cmp -s "$tmp" "$dest"; then echo "unchanged: $dest"; return 0; fi
+  if [ -f "$dest" ]; then cp "$dest" "$dest.bak"; fi
+  cat "$tmp" > "$dest"
+  echo "fetched: $dest"
+}
+# fetch <repo相对路径> <目标绝对路径> — 内容有变才征求覆盖(.bak 备份);一致则静默跳过
+fetch() {
+  local rel="$1" dest="$2" tmp
+  if [ -L "$dest" ]; then
+    echo "跳过: $dest 是符号链接(指向 $(readlink "$dest")),不覆盖以免破坏链接目标"
+    return 0
   fi
-  dlto "$RAW/$1" "$dest" && echo "fetched: $dest"
+  tmp="$(mktemp)"
+  if ! dlto "$RAW/$rel" "$tmp"; then
+    rm -f "$tmp"; echo "WARN: $rel 下载失败,保留现有 $dest" >&2; return 0
+  fi
+  if [ -f "$dest" ] && ! cmp -s "$tmp" "$dest"; then
+    ask "$dest 已存在,用 dot_file 仓库版本覆盖?(原文件存为 $dest.bak)" || { rm -f "$tmp"; return 0; }
+  fi
+  _commit "$tmp" "$dest"
+  rm -f "$tmp"
 }
 
 echo "== linux 环境一键配置(zsh / oh-my-zsh / tmux)=="
@@ -348,8 +364,9 @@ if [ -x "$HOME/.local/bin/lvim" ] || [ -d "$HOME/.config/lvim" ]; then
     mkdir -p "$HOME/.config/lvim"
     for f in config.lua lv-settings.lua lazy-lock.json my_config.lua my_keymap.lua my_onedark.lua my_playground.lua my_surround.lua; do
       dest="$HOME/.config/lvim/$f"
-      if [ -f "$dest" ]; then cp "$dest" "$dest.bak"; fi
-      if dlto "$RAW/lvim/$f" "$dest"; then echo "fetched: $dest"; else echo "WARN: lvim/$f 拉取失败"; fi
+      tmp="$(mktemp)"
+      if dlto "$RAW/lvim/$f" "$tmp"; then _commit "$tmp" "$dest"; else echo "WARN: lvim/$f 拉取失败"; fi
+      rm -f "$tmp"
     done
     if [ -x "$HOME/.local/bin/lvim" ]; then
       "$HOME/.local/bin/lvim" --headless -c 'Lazy! sync' -c 'qa' >/dev/null 2>&1 \
