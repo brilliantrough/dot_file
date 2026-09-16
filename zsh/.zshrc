@@ -8,9 +8,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="robbyrussell" ZSH_THEME="random" ZSH_THEME="cloud"
 ZSH_THEME="clean"
-# ZSH_THEME="xiong-chiamiov"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -74,7 +72,6 @@ ZSH_THEME="clean"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git autojump zsh-autosuggestions zsh-syntax-highlighting tmux shell-proxy)
 
-fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
 source $ZSH/oh-my-zsh.sh
 
 # Ctrl+O / Ctrl+W:逐字符/逐词接受 zsh-autosuggestions 的灰色补全
@@ -118,10 +115,6 @@ if [ -f ~/.variable ]; then
     source ~/.variable
 fi
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 # fnm
 FNM_PATH="$HOME/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
@@ -142,20 +135,3 @@ export PATH=$HOME/.opencode/bin:$PATH
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# yazi - terminal file manager
-function y() {
-    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-    yazi --cwd-file="$tmp"
-    if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-        cd -- "$cwd"
-    fi
-    rm -f -- "$tmp"
-}
-
-# zoxide - smart cd command(未安装则跳过)
-command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
-
-export YDOTOOL_SOCKET="$HOME/.ydotool_socket"
-
-bindkey '^O' forward-char
-bindkey '^U' forward-word
