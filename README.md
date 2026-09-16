@@ -8,7 +8,9 @@
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/brilliantrough/dot_file/master/linux-setup.sh)"
 ```
 
-脚本做的事（交互确认 + 幂等；配置覆盖前存 `.bak`）：
+脚本做的事（**仅面向 Debian/Ubuntu 系,apt**；交互确认 + 幂等；配置覆盖前存 `.bak`）：
+
+询问默认：装缺的软件/插件、部署配置 → `[Y/n]`（回车即装）；覆盖已有配置、配置免密 sudo、无代理或仍是默认源下继续 → `[y/N]`。
 
 | 步骤 | 内容 |
 |---|---|

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# linux-setup.sh — 一键 zsh + oh-my-zsh + 插件 + tmux + 配置文件(brilliantrough/dot_file)
+# linux-setup.sh — 一键 zsh + oh-my-zsh + 插件 + tmux + 配置文件(仅面向 Debian/Ubuntu 系,apt)
 # 用法:bash linux-setup.sh   (交互确认 + 幂等;已存在的配置覆盖前存 .bak)
 # 询问默认:装缺的软件/插件、部署配置 → [Y/n](回车即装);覆盖已有配置、配置免密 sudo、
 #          无代理或仍是默认源下继续 → [y/N](回车即跳过);非交互环境按各自默认执行
