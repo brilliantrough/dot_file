@@ -3,7 +3,7 @@
 # 用法:bash linux-setup.sh   (交互确认 + 幂等;已存在的配置覆盖前存 .bak)
 #
 # 干什么:
-#   0. 代理提醒(直连 GitHub 常失败,建议先 export http_proxy/https_proxy)
+#   0. 代理提醒(大小写的 http(s)_proxy/all_proxy 都查;未设则探测直连,透明代理不拦)
 #   0.5 提权检查:root 可直接跑;普通用户检测 sudo 免密,可选一键写入 /etc/sudoers.d 配置 NOPASSWD
 #   0.6 apt 源检查:仍是官方默认源则提醒换清华/南大镜像(不代改,只给网址)
 #   1. 系统包:zsh tmux git wget(必需)+ vim neovim autojump make python3-pip ca-certificates(可选,缺才装)
@@ -65,12 +65,20 @@ fetch() {
 echo "== linux 环境一键配置(zsh / oh-my-zsh / tmux)=="
 
 # ---- 0. 代理提醒 ----
-proxy="${http_proxy:-${https_proxy:-${all_proxy:-}}}"
+# 大小写都查;无代理环境变量时再探测直连(排除路由器层透明代理的情况)
+proxy="${http_proxy:-${https_proxy:-${all_proxy:-${HTTP_PROXY:-${HTTPS_PROXY:-${ALL_PROXY:-}}}}}}"
+net_ok() {
+  if command -v curl >/dev/null 2>&1; then curl -fsSI --connect-timeout 5 -m 8 -o /dev/null https://github.com
+  else wget -q --spider -T 8 https://github.com; fi
+}
 if [ -n "$proxy" ]; then
   echo "代理: $proxy"
+elif net_ok 2>/dev/null; then
+  echo "未设代理环境变量,但直连 github.com 可达(可能是透明代理),继续"
 else
-  echo "提醒: 未检测到代理环境变量。直连 GitHub 经常失败,建议先 export http_proxy/https_proxy 再继续。"
-  ask "没有代理也继续吗?" || exit 1
+  echo "提醒: 未检测到代理环境变量(大小写的 http(s)_proxy / all_proxy 都查了),且直连 github.com 不通。"
+  echo "      建议先 export http_proxy/https_proxy 再继续;有透明代理则可忽略。"
+  ask "仍要继续吗?" || exit 1
 fi
 
 # ---- 0.5 提权检查(root / sudo 免密) ----
