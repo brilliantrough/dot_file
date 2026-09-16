@@ -4,12 +4,13 @@
 setproxy() {
   local p="http://localhost:7890"
   export http_proxy=$p https_proxy=$p all_proxy=$p \
-         HTTP_PROXY=$p HTTPS_PROXY=$p ALL_PROXY=$p \
-         NO_PROXY="localhost,127.0.0.1"
+         HTTP_PROXY=$p HTTPS_PROXY=$p ALL_PROXY=$p
+  export NO_PROXY="localhost,127.0.0.1,::1,0.0.0.0,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16,.local,.internal"
+  export no_proxy=$NO_PROXY
 }
 
 initproxy() {
-  unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY NO_PROXY
+  unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY NO_PROXY no_proxy
 }
 
 # ---- env ----
