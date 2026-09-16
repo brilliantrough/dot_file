@@ -4,7 +4,7 @@
 #
 # 干什么:
 #   0. 代理提醒(直连 GitHub 常失败,建议先 export http_proxy/https_proxy)
-#   1. 系统包:zsh tmux git wget autojump ca-certificates(缺才装,征求同意)
+#   1. 系统包:zsh tmux git wget(必需)+ vim neovim autojump ca-certificates(可选,缺才装,征求同意)
 #   2. oh-my-zsh(--unattended) + 默认 shell 切 zsh
 #   3. omz 插件:zsh-syntax-highlighting、zsh-autosuggestions
 #   4. 配置文件:~/.zshrc ~/.aliases ~/.func ~/.tmux.conf ~/.tmux.conf.local
@@ -54,16 +54,27 @@ else
 fi
 
 # ---- 1. 系统包 ----
-missing=""
+req=""; opt=""
 for p in zsh tmux git wget; do
-  command -v "$p" >/dev/null 2>&1 || missing="$missing $p"
+  command -v "$p" >/dev/null 2>&1 || req="$req $p"
 done
-command -v autojump >/dev/null 2>&1 || missing="$missing autojump"
-if [ -n "$missing" ]; then
-  if ask "缺少系统包:$missing。用 apt-get 安装?(含 ca-certificates)"; then
+command -v vim      >/dev/null 2>&1 || opt="$opt vim"
+command -v nvim     >/dev/null 2>&1 || opt="$opt neovim"
+command -v autojump >/dev/null 2>&1 || opt="$opt autojump"
+if [ -n "$req$opt" ]; then
+  if ask "缺少系统包:$req $opt。用 apt-get 安装?(含 ca-certificates)"; then
     sudo apt-get update
-    # shellcheck disable=SC2086
-    sudo apt-get install -y $missing ca-certificates  else
+    # req 与 opt 分开装:否则某个可选包(如 neovim/autojump)不在 apt 源里时,
+    # apt 会因 "Unable to locate package" 整批失败,连 zsh 都装不上
+    if [ -n "$req" ]; then
+      # shellcheck disable=SC2086
+      sudo apt-get install -y $req ca-certificates
+    fi
+    if [ -n "$opt" ]; then
+      # shellcheck disable=SC2086
+      sudo apt-get install -y $opt || echo "WARN: 可选包安装失败(如 neovim/autojump 不在 apt 源里),不影响后续"
+    fi
+  else
     echo "跳过安装;后续步骤可能失败"
   fi
 fi
