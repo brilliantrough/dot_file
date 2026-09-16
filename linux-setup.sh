@@ -90,16 +90,20 @@ for f in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.l
   if [ -f "$f" ]; then src_files="$src_files $f"; fi
 done
 if [ -n "$src_files" ]; then
-  # 只看非注释行;deb822(.sources) 的 URIs: 行同样命中
+  # 覆盖两种格式:传统 one-line(/etc/apt/sources.list 与 *.list)
+  # 和 deb822(Ubuntu 24.04+/26.04「resolute」、Debian 12+ 的 *.sources,看 URIs: 行)
+  # 排除 security 行:镜像站帮助明确建议 security 源保持官方,故它是否官方不代表没换源
   # shellcheck disable=SC2086
-  if grep -qE '^[[:space:]]*[^#].*(deb\.debian\.org|security\.debian\.org|httpredir\.debian\.org|archive\.ubuntu\.com|security\.ubuntu\.com|ports\.ubuntu\.com)' $src_files 2>/dev/null; then
-    echo "提醒: apt 仍是官方默认源(国内访问慢、易超时失败)。建议先换国内镜像源再继续:"
-    echo "  清华(含各发行版帮助页): https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/  |  .../help/debian/"
-    echo "  南大: https://mirror.nju.edu.cn/"
-    echo "  (脚本不代改源:发行版/版本代号与 deb822 格式差异大,改错会锁死 apt;换完重跑本脚本)"
+  active="$(grep -hE '^[[:space:]]*[^#]' $src_files 2>/dev/null | grep -viE 'security' || true)"
+  if printf '%s\n' "$active" | grep -qE '(deb\.debian\.org|httpredir\.debian\.org|archive\.ubuntu\.com|ports\.ubuntu\.com)'; then
+    echo "提醒: apt 主源仍是官方默认源(国内访问慢、易超时失败)。建议换国内镜像源再继续:"
+    echo "  清华: https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/  (Debian: .../help/debian/)"
+    echo "  南大: https://mirror.nju.edu.cn/help/ubuntu/            (Debian: .../help/debian/)"
+    echo "  注: Ubuntu 24.04+/26.04(代号 resolute)的源在 /etc/apt/sources.list.d/ubuntu.sources"
+    echo "      (deb822 格式,改 URIs:),Debian 12+ 同理是 debian.sources。脚本不代改源(改错会锁死 apt)。"
     ask "仍是默认源,继续吗?" || exit 1
   else
-    echo "apt 源: 非官方默认源(已换源或自定义)"
+    echo "apt 源: 非官方主源(已换源或自定义)"
   fi
 fi
 
