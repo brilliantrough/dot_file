@@ -30,10 +30,16 @@ RAW="https://raw.githubusercontent.com/brilliantrough/dot_file/master"
 ask() { # $1=提示 $2=默认(Y/N,缺省 N)
   local a="" def="${2:-N}" hint="y/N"
   [ "$def" = Y ] && hint="Y/n"
-  # 不能加 2>/dev/null:read -p 的提示符写往 stderr,吞掉后提示不可见,脚本像卡死
-  # 读 /dev/tty:curl|bash 时 stdin 是脚本管道,绝不能从 stdin 读,否则会吞掉脚本行
-  if { [ -t 0 ] || [ -e /dev/tty ]; } && read -r -p "$1 [$hint] " a < /dev/tty; then
-    if [ -z "$a" ]; then [ "$def" = Y ]; else [[ "$a" =~ ^[Yy]$ ]]; fi
+  # 先探测 tty 是否真能用(容器/无控制终端时 /dev/tty 打开会失败):不可用则直接取默认,
+  # 避免把 "No such device" 刷到 stderr
+  if [ -t 0 ] || { true < /dev/tty; } 2>/dev/null; then
+    # 不能把 2>/dev/null 加到下面这句:read -p 的提示符写往 stderr,吞掉后提示不可见,脚本像卡死
+    # 读 /dev/tty:curl|bash 时 stdin 是脚本管道,绝不能从 stdin 读,否则会吞掉脚本行
+    if read -r -p "$1 [$hint] " a < /dev/tty; then
+      if [ -z "$a" ]; then [ "$def" = Y ]; else [[ "$a" =~ ^[Yy]$ ]]; fi
+    else
+      [ "$def" = Y ]
+    fi
   else
     [ "$def" = Y ]  # 非交互环境:按该询问的默认值(Y 则执行,N 则跳过)
   fi
@@ -295,8 +301,13 @@ elif ask "安装 tmux 插件管理器 tpm(并装 .tmux.conf 里声明的插件)?
     || echo "WARN: tpm clone 失败(检查代理)"
 fi
 if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+  # gpakosz/.tmux 不走上游 tpm 的 conf 钩子,直接跑 tpm 会因 TMUX_PLUGIN_MANAGER_PATH 未设而 abort。
+  # 且必须起一个 session 让 server 活着——否则 server 无 session 会立刻退出,set-environment 丢失。
+  tmux new-session -d -s _tpm_boot 2>/dev/null || true
+  tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$HOME/.tmux/plugins" 2>/dev/null || true
   "$HOME/.tmux/plugins/tpm/bin/install_plugins" >/dev/null 2>&1 \
     || echo "WARN: tpm 插件安装未完成,进 tmux 后按 prefix + I 重试"
+  tmux kill-session -t _tpm_boot 2>/dev/null || true
 fi
 
 # ---- 6. ripgrep:有提权走 apt,否则 GitHub musl 二进制到 ~/.local/bin ----

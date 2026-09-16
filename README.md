@@ -63,6 +63,21 @@ mkdir -p ~/.config/lvim && cp -r lvim/* ~/.config/lvim/
 
 敏感信息(key、网关地址)一律以 `<YOUR_*>` 占位符入库,部署时替换。
 
+## docker
+
+`docker/Dockerfile` —— 在项目方 base 镜像上叠加「系统级」软件：apt 包（zsh/tmux/git/openssh/neovim/autojump/ripgrep/python3…）+ `uv`/`fnm`/`bun`/`mihomo` 装到 `/usr/local`，并用 `uv` 预装 Python 3.9~3.13。
+
+**关键原则（已实测）**：容器启动时会用 `-v <持久目录>:$HOME` 覆盖家目录做持久化 → 镜像里写在 `$HOME` 下的东西启动时会被挂载**遮蔽（mask）**，等于白装。所以镜像只装 `/usr`、`/usr/local`；凡是天然住在 `$HOME` 的（oh-my-zsh / tpm / LunarVim / dotfiles）都留到容器启动后再装，装进被挂载的家目录即持久化。
+
+```bash
+docker build -t myserver docker/          # 需要代理时:--build-arg https_proxy=http://host:7890
+docker run -d --name srv -v /你的持久目录:/root myserver sleep infinity
+# 首次在容器里做家目录配置(镜像里已有的软件会被自动跳过,只装 $HOME 内的东西)
+docker exec -it srv zsh -lc 'bash <(curl -fsSL https://raw.githubusercontent.com/brilliantrough/dot_file/master/linux-setup.sh)'
+```
+
+opencode 三件套同理，在容器内跑 agent-skills 的 `opencode-setup.sh`。
+
 ## squid
 
 `/etc/squid/squid.conf` 文件（已停用,仅存档）
