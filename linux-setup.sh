@@ -283,7 +283,7 @@ if command -v mihomo >/dev/null 2>&1 || [ -x "$HOME/.local/bin/mihomo" ]; then
   echo "mihomo 已存在,跳过"
 else
   case "$(uname -m)" in
-    x86_64|amd64)  mh_arch=amd64-compatible ;;  # 兼容老 CPU(免 SIGILL);新 CPU 可手动换 amd64
+    x86_64|amd64)  mh_arch=amd64 ;;  # 新 CPU 用 amd64;老 CPU 若 SIGILL 再换 amd64-compatible
     aarch64|arm64) mh_arch=arm64 ;;
     armv7l|armv7)  mh_arch=armv7 ;;
     i386|i686)     mh_arch=386 ;;
