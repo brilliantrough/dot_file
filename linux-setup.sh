@@ -5,6 +5,7 @@
 # 干什么:
 #   0. 代理提醒(直连 GitHub 常失败,建议先 export http_proxy/https_proxy)
 #   0.5 提权检查:root 可直接跑;普通用户检测 sudo 免密,可选一键写入 /etc/sudoers.d 配置 NOPASSWD
+#   0.6 apt 源检查:仍是官方默认源则提醒换清华/南大镜像(不代改,只给网址)
 #   1. 系统包:zsh tmux git wget(必需)+ vim neovim autojump ca-certificates(可选,缺才装,征求同意)
 #   2. oh-my-zsh(--unattended) + 默认 shell 切 zsh
 #   3. omz 插件:zsh-syntax-highlighting、zsh-autosuggestions
@@ -81,6 +82,25 @@ elif command -v sudo >/dev/null 2>&1; then
 else
   SUDO=""; can_install=0
   echo "WARN: 非 root 且未安装 sudo,将跳过系统包安装" >&2
+fi
+
+# ---- 0.6 apt 源检查 ----
+src_files=""
+for f in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+  if [ -f "$f" ]; then src_files="$src_files $f"; fi
+done
+if [ -n "$src_files" ]; then
+  # 只看非注释行;deb822(.sources) 的 URIs: 行同样命中
+  # shellcheck disable=SC2086
+  if grep -qE '^[[:space:]]*[^#].*(deb\.debian\.org|security\.debian\.org|httpredir\.debian\.org|archive\.ubuntu\.com|security\.ubuntu\.com|ports\.ubuntu\.com)' $src_files 2>/dev/null; then
+    echo "提醒: apt 仍是官方默认源(国内访问慢、易超时失败)。建议先换国内镜像源再继续:"
+    echo "  清华(含各发行版帮助页): https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/  |  .../help/debian/"
+    echo "  南大: https://mirror.nju.edu.cn/"
+    echo "  (脚本不代改源:发行版/版本代号与 deb822 格式差异大,改错会锁死 apt;换完重跑本脚本)"
+    ask "仍是默认源,继续吗?" || exit 1
+  else
+    echo "apt 源: 非官方默认源(已换源或自定义)"
+  fi
 fi
 
 # ---- 1. 系统包 ----
