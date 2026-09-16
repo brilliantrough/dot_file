@@ -86,6 +86,10 @@ kde_refresh() {
 }
 
 ocreload() {
-  curl -s -X POST "http://127.0.0.1:${OC_PORT:-5010}/instance/dispose?directory=${1:-$PWD}"
+  curl -s -w " [HTTP %{http_code}]" \
+    -u "${OPENCODE_SERVER_USERNAME:-username}:${OPENCODE_SERVER_PASSWORD:-123456}" \
+    -X POST "http://127.0.0.1:${OC_PORT:-5010}/instance/dispose?directory=${1:-$PWD}"
   echo
 }
+
+
