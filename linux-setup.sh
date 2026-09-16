@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # linux-setup.sh — 一键 zsh + oh-my-zsh + 插件 + tmux + 配置文件(brilliantrough/dot_file)
 # 用法:bash linux-setup.sh   (交互确认 + 幂等;已存在的配置覆盖前存 .bak)
+# 询问默认:装缺的软件/插件、部署配置 → [Y/n](回车即装);覆盖已有配置、配置免密 sudo、
+#          无代理或仍是默认源下继续 → [y/N](回车即跳过);非交互环境按各自默认执行
 #
 # 干什么:
 #   0. 代理提醒(大小写的 http(s)_proxy/all_proxy 都查;未设则探测直连,透明代理不拦)
@@ -25,13 +27,15 @@ set -euo pipefail
 
 RAW="https://raw.githubusercontent.com/brilliantrough/dot_file/master"
 
-ask() { # 读 /dev/tty:curl|bash 时 stdin 是脚本管道,绝不能从 stdin 读,否则会吞掉脚本行
-  local a=""
+ask() { # $1=提示 $2=默认(Y/N,缺省 N)
+  local a="" def="${2:-N}" hint="y/N"
+  [ "$def" = Y ] && hint="Y/n"
   # 不能加 2>/dev/null:read -p 的提示符写往 stderr,吞掉后提示不可见,脚本像卡死
-  if { [ -t 0 ] || [ -e /dev/tty ]; } && read -r -p "$1 [y/N] " a < /dev/tty; then
-    [[ "$a" =~ ^[Yy]$ ]]
+  # 读 /dev/tty:curl|bash 时 stdin 是脚本管道,绝不能从 stdin 读,否则会吞掉脚本行
+  if { [ -t 0 ] || [ -e /dev/tty ]; } && read -r -p "$1 [$hint] " a < /dev/tty; then
+    if [ -z "$a" ]; then [ "$def" = Y ]; else [[ "$a" =~ ^[Yy]$ ]]; fi
   else
-    false  # 非交互环境一律默认否
+    [ "$def" = Y ]  # 非交互环境:按该询问的默认值(Y 则执行,N 则跳过)
   fi
 }
 dlto() { # $1=url $2=dest(wget 优先,curl 兜底,均遵循 http(s)_proxy);超时防代理抖动时无限静默等待
@@ -165,7 +169,7 @@ if [ "$can_install" -eq 0 ]; then
     echo "跳过系统包安装(无提权),请手动安装:$req $opt"
   fi
 elif [ -n "$req$opt" ]; then
-  if ask "缺少系统包:$req $opt。用 apt-get 安装?(含 ca-certificates)"; then
+  if ask "缺少系统包:$req $opt。用 apt-get 安装?(含 ca-certificates)" Y; then
     $SUDO apt-get update
     # req 与 opt 分开装:否则某个可选包(如 neovim/autojump)不在 apt 源里时,
     # apt 会因 "Unable to locate package" 整批失败,连 zsh 都装不上
@@ -190,7 +194,7 @@ if [ -z "$ssh_pkgs" ]; then
   echo "openssh 已存在(server + client)"
 elif [ "$can_install" -eq 0 ]; then
   echo "跳过 openssh 安装(无提权),请手动安装:$ssh_pkgs"
-elif ask "未检测到:$ssh_pkgs。安装 openssh(sshd 会尝试设为开机自启)?"; then
+elif ask "未检测到:$ssh_pkgs。安装 openssh(sshd 会尝试设为开机自启)?" Y; then
   # shellcheck disable=SC2086
   if $SUDO apt-get install -y $ssh_pkgs; then
     if [ -x /usr/sbin/sshd ] || command -v sshd >/dev/null 2>&1; then
@@ -212,13 +216,13 @@ fi
 # ---- 1.6 用户级运行时:uv / fnm(+Node LTS)/ bun(无需 sudo;opencode-setup.sh 依赖它们) ----
 if command -v uv >/dev/null 2>&1 || [ -x "$HOME/.local/bin/uv" ]; then
   echo "uv 已存在,跳过"
-elif ask "安装 uv(python 包/项目管理器)?"; then
+elif ask "安装 uv(python 包/项目管理器)?" Y; then
   run_installer https://astral.sh/uv/install.sh sh --no-modify-path
 fi
 # 常用 Python 版本(uv 管理;已装的会跳过)
 if command -v uv >/dev/null 2>&1 || [ -x "$HOME/.local/bin/uv" ]; then
   uv_bin="$(command -v uv 2>/dev/null || echo "$HOME/.local/bin/uv")"
-  if ask "用 uv 安装常用 Python 版本 3.9~3.13?"; then
+  if ask "用 uv 安装常用 Python 版本 3.9~3.13?" Y; then
     "$uv_bin" python install 3.9 3.10 3.11 3.12 3.13 \
       || echo "WARN: 部分 Python 版本安装失败(可单独重跑: uv python install 3.12)"
   fi
@@ -226,7 +230,7 @@ fi
 
 if command -v fnm >/dev/null 2>&1 || [ -x "$HOME/.local/share/fnm/fnm" ]; then
   echo "fnm 已存在,跳过"
-elif ask "安装 fnm + Node LTS?"; then
+elif ask "安装 fnm + Node LTS?" Y; then
   run_installer https://fnm.vercel.app/install bash --skip-shell
 fi
 # fnm 在但缺 Node:补一个 LTS(--skip-shell 不写 shell 配置,~/.zshrc 里已有 fnm 初始化)
@@ -241,14 +245,14 @@ fi
 
 if command -v bun >/dev/null 2>&1 || [ -x "$HOME/.bun/bin/bun" ]; then
   echo "bun 已存在,跳过"
-elif ask "安装 bun?"; then
+elif ask "安装 bun?" Y; then
   run_installer https://bun.sh/install bash
 fi
 
 # ---- 2. oh-my-zsh ----
 if [ -d "$HOME/.oh-my-zsh" ]; then
   echo "oh-my-zsh 已存在,跳过安装"
-elif ask "安装 oh-my-zsh?(--unattended,并把默认 shell 切到 zsh)"; then
+elif ask "安装 oh-my-zsh?(--unattended,并把默认 shell 切到 zsh)" Y; then
   # mktemp 而非固定 /tmp 路径:fs.protected_regular=2 时,粘滞目录(/tmp)里
   # 改写他人属主的已存在文件会 EACCES,root 也不豁免;临时文件属主必是自己
   omz_install="$(mktemp)"
@@ -286,7 +290,7 @@ if ! command -v tmux >/dev/null 2>&1; then
   echo "跳过 tpm:未安装 tmux"
 elif [ -d "$HOME/.tmux/plugins/tpm" ]; then
   echo "tpm 已存在,跳过"
-elif ask "安装 tmux 插件管理器 tpm(并装 .tmux.conf 里声明的插件)?"; then
+elif ask "安装 tmux 插件管理器 tpm(并装 .tmux.conf 里声明的插件)?" Y; then
   git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm" \
     || echo "WARN: tpm clone 失败(检查代理)"
 fi
@@ -299,7 +303,7 @@ fi
 rg_ok=0
 if command -v rg >/dev/null 2>&1; then
   echo "ripgrep 已存在: $(command -v rg)"; rg_ok=1
-elif [ "$can_install" -eq 1 ] && ask "安装 ripgrep(apt)?"; then
+elif [ "$can_install" -eq 1 ] && ask "安装 ripgrep(apt)?" Y; then
   if $SUDO apt-get install -y ripgrep; then rg_ok=1; else echo "WARN: apt 装 ripgrep 失败,改走二进制"; fi
 fi
 if [ "$rg_ok" -eq 0 ]; then
@@ -311,7 +315,7 @@ if [ "$rg_ok" -eq 0 ]; then
   esac
   if [ -z "$rg_target" ]; then
     echo "WARN: 未知架构 $(uname -m),跳过 ripgrep 二进制"
-  elif ask "从 GitHub 下载 ripgrep($rg_target) 到 ~/.local/bin?"; then
+  elif ask "从 GitHub 下载 ripgrep($rg_target) 到 ~/.local/bin?" Y; then
     rg_tag="$(curl -fsSLI -o /dev/null -w '%{url_effective}' --connect-timeout 8 -m 30 https://github.com/BurntSushi/ripgrep/releases/latest 2>/dev/null | sed 's#.*/##')"
     rg_tmp="$(mktemp)"; rg_dir="$(mktemp -d)"
     if [ -n "$rg_tag" ] && curl -fsSL --connect-timeout 8 -m 180 -o "$rg_tmp" \
@@ -346,7 +350,7 @@ else
   esac
   if [ -z "$mh_arch" ]; then
     echo "WARN: 未知架构 $(uname -m),跳过 mihomo"
-  elif ask "下载 mihomo($mh_arch) 到 ~/.local/bin?"; then
+  elif ask "下载 mihomo($mh_arch) 到 ~/.local/bin?" Y; then
     mh_tag="$(curl -fsSLI -o /dev/null -w '%{url_effective}' --connect-timeout 8 -m 30 https://github.com/MetaCubeX/mihomo/releases/latest 2>/dev/null | sed 's#.*/##')"
     mh_tmp="$(mktemp)"
     if [ -n "$mh_tag" ] && curl -fsSL --connect-timeout 8 -m 300 -o "$mh_tmp" \
@@ -388,7 +392,7 @@ fi
 
 # LunarVim 配置部署(无 sudo;须在安装之后——安装器会重建 ~/.config/lvim)
 if [ -x "$HOME/.local/bin/lvim" ] || [ -d "$HOME/.config/lvim" ]; then
-  if ask "部署 lvim 配置到 ~/.config/lvim(原文件存 .bak)?"; then
+  if ask "部署 lvim 配置到 ~/.config/lvim(原文件存 .bak)?" Y; then
     mkdir -p "$HOME/.config/lvim"
     for f in config.lua lv-settings.lua lazy-lock.json my_config.lua my_keymap.lua my_onedark.lua my_playground.lua my_surround.lua; do
       dest="$HOME/.config/lvim/$f"
