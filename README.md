@@ -19,7 +19,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/brilliantrough/dot_file/
 | 0 | 代理提醒；提权检查（root 直接用；普通用户可选一键配置 sudo 免密）；apt 源检查（仍是官方源则提示换清华/南大镜像） |
 | 1 | 系统包：`zsh tmux git wget`（必需）+ `vim neovim autojump make python3-pip ca-certificates`（可选） |
 | 1.5 | openssh：缺 `sshd` 则装 `openssh-server` 并尝试设为开机自启（部分发行版/容器镜像默认不装） |
-| 1.6 | 用户级运行时：`uv`（+ Python 3.9~3.13）、`fnm`（+Node LTS）、`bun`。提前装好，agent-skills 的 `opencode-setup.sh` 即可直接通过 |
+| 1.6 | 用户级运行时：`uv`（+ Python 3.9~3.13、自升级、清华 PyPI 镜像）、`fnm`（+Node LTS）、`bun`。提前装好，agent-skills 的 `opencode-setup.sh` 即可直接通过 |
 | 2-3 | oh-my-zsh（`--unattended`，切默认 shell）+ 插件 zsh-syntax-highlighting / zsh-autosuggestions |
 | 4 | 部署 `~/.zshrc` `~/.aliases` `~/.func` `~/.tmux.conf` `~/.tmux.conf.local` `~/.condarc` |
 | 5 | tmux 插件管理器 tpm（+ 按 `.tmux.conf` 安装插件） |

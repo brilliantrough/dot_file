@@ -10,7 +10,7 @@
 #   0.6 apt 源检查:仍是官方默认源则提醒换清华/南大镜像(不代改,只给网址)
 #   1. 系统包:zsh tmux git wget(必需)+ vim neovim autojump make python3-pip ca-certificates(可选,缺才装)
 #   1.5 openssh:缺 sshd 则装 openssh-server 并尝试设为开机自启(部分发行版/镜像默认不装)
-#   1.6 用户级运行时:uv(+Python 3.9~3.13)、fnm(+Node LTS)、bun(无需 sudo;提前装好,opencode-setup.sh 即可直接通过)
+#   1.6 用户级运行时:uv(+Python 3.9~3.13、自升级、清华 PyPI 镜像)、fnm(+Node LTS)、bun(无需 sudo;提前装好,opencode-setup.sh 即可直接通过)
 #   2. oh-my-zsh(--unattended) + 默认 shell 切 zsh
 #   3. omz 插件:zsh-syntax-highlighting、zsh-autosuggestions
 #   4. 配置文件:~/.zshrc ~/.aliases ~/.func ~/.tmux.conf ~/.tmux.conf.local ~/.condarc(清华源)
@@ -225,6 +225,32 @@ if command -v uv >/dev/null 2>&1 || [ -x "$HOME/.local/bin/uv" ]; then
   if ask "用 uv 安装常用 Python 版本 3.9~3.13?" Y; then
     "$uv_bin" python install 3.9 3.10 3.11 3.12 3.13 \
       || echo "WARN: 部分 Python 版本安装失败(可单独重跑: uv python install 3.12)"
+  fi
+fi
+
+# uv 自升级 + PyPI 镜像(国内;uv 按语义化版本读 ~/.config/uv/uv.toml)
+if [ -n "${uv_bin:-}" ]; then
+  uv_cur="$("$uv_bin" --version 2>/dev/null | awk '{print $2}' || true)"
+  uv_latest="$(curl -fsSL --connect-timeout 5 -m 8 https://api.github.com/repos/astral-sh/uv/releases/latest 2>/dev/null \
+    | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4 || true)"
+  if [ -z "$uv_latest" ]; then
+    echo "跳过 uv 自升级:查不到最新版本(检查网络/代理)"
+  elif [ "$uv_latest" != "$uv_cur" ]; then
+    if ask "uv ${uv_cur:-未知} → $uv_latest,升级(uv self update)?" Y; then
+      "$uv_bin" self update || echo "WARN: uv 自升级失败(系统包管理器装的请用系统方式升级)" >&2
+    fi
+  else
+    echo "uv 已是最新(${uv_cur:-未知})"
+  fi
+  uv_cfg="$HOME/.config/uv/uv.toml"
+  if grep -q 'pypi.tuna' "$uv_cfg" 2>/dev/null; then
+    echo "uv PyPI 镜像已配置(清华),跳过"
+  elif [ -f "$uv_cfg" ]; then
+    echo "跳过 uv 镜像:$uv_cfg 已存在(非本脚本写入),不覆盖"
+  elif ask "配置 uv 用清华 PyPI 镜像($uv_cfg)?" Y; then
+    mkdir -p "$(dirname "$uv_cfg")"
+    printf '%s\n' 'index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"' > "$uv_cfg"
+    echo "wrote: $uv_cfg"
   fi
 fi
 
