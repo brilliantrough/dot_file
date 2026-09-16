@@ -4,6 +4,7 @@
 #
 # 干什么:
 #   0. 代理提醒(直连 GitHub 常失败,建议先 export http_proxy/https_proxy)
+#   0.5 提权检查:root 可直接跑;普通用户检测 sudo 免密,可选一键写入 /etc/sudoers.d 配置 NOPASSWD
 #   1. 系统包:zsh tmux git wget(必需)+ vim neovim autojump ca-certificates(可选,缺才装,征求同意)
 #   2. oh-my-zsh(--unattended) + 默认 shell 切 zsh
 #   3. omz 插件:zsh-syntax-highlighting、zsh-autosuggestions
@@ -53,6 +54,35 @@ else
   ask "没有代理也继续吗?" || exit 1
 fi
 
+# ---- 0.5 提权检查(root / sudo 免密) ----
+SUDO="sudo"; can_install=1
+if [ "$(id -u)" -eq 0 ]; then
+  SUDO=""
+  echo "以 root 运行:无需 sudo"
+elif command -v sudo >/dev/null 2>&1; then
+  if sudo -n true 2>/dev/null; then
+    echo "sudo 免密已可用"
+  elif ask "sudo 需要密码输入。是否配置免密 sudo(写入 /etc/sudoers.d/,期间需输入一次密码)?"; then
+    sudoers_tmp="$(mktemp)"
+    printf '%s ALL=(ALL) NOPASSWD:ALL\n' "$(id -un)" > "$sudoers_tmp"
+    # 先 visudo 校验再落盘:坏的 sudoers 会锁死 sudo
+    if sudo visudo -cf "$sudoers_tmp" >/dev/null 2>&1 \
+       && sudo install -m 440 -o root -g root -- "$sudoers_tmp" "/etc/sudoers.d/99-$(id -un)-nopasswd"; then
+      if sudo -n true 2>/dev/null; then
+        echo "免密 sudo 已配置并即刻生效"
+      else
+        echo "WARN: 已写入但仍需密码,请检查 /etc/sudoers.d"
+      fi
+    else
+      echo "WARN: 免密 sudo 配置失败(visudo 校验或写入失败),继续用密码 sudo"
+    fi
+    rm -f "$sudoers_tmp"
+  fi
+else
+  SUDO=""; can_install=0
+  echo "WARN: 非 root 且未安装 sudo,将跳过系统包安装" >&2
+fi
+
 # ---- 1. 系统包 ----
 req=""; opt=""
 for p in zsh tmux git wget; do
@@ -61,18 +91,22 @@ done
 command -v vim      >/dev/null 2>&1 || opt="$opt vim"
 command -v nvim     >/dev/null 2>&1 || opt="$opt neovim"
 command -v autojump >/dev/null 2>&1 || opt="$opt autojump"
-if [ -n "$req$opt" ]; then
+if [ "$can_install" -eq 0 ]; then
+  if [ -n "$req$opt" ]; then
+    echo "跳过系统包安装(无提权),请手动安装:$req $opt"
+  fi
+elif [ -n "$req$opt" ]; then
   if ask "缺少系统包:$req $opt。用 apt-get 安装?(含 ca-certificates)"; then
-    sudo apt-get update
+    $SUDO apt-get update
     # req 与 opt 分开装:否则某个可选包(如 neovim/autojump)不在 apt 源里时,
     # apt 会因 "Unable to locate package" 整批失败,连 zsh 都装不上
     if [ -n "$req" ]; then
       # shellcheck disable=SC2086
-      sudo apt-get install -y $req ca-certificates
+      $SUDO apt-get install -y $req ca-certificates
     fi
     if [ -n "$opt" ]; then
       # shellcheck disable=SC2086
-      sudo apt-get install -y $opt || echo "WARN: 可选包安装失败(如 neovim/autojump 不在 apt 源里),不影响后续"
+      $SUDO apt-get install -y $opt || echo "WARN: 可选包安装失败(如 neovim/autojump 不在 apt 源里),不影响后续"
     fi
   else
     echo "跳过安装;后续步骤可能失败"
