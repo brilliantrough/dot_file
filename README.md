@@ -1,14 +1,16 @@
-# 关于
+# dot_file
 
-此仓库用来存储 Linux 系统中的一些配置文件，通常这些配置文件都是以点开头的隐藏文件。
-
-## 一键配置
+一条命令迁移复原我在 Linux 上的常用应用软件配置（**仅面向 Debian/Ubuntu 系，apt**；交互确认 + 幂等；覆盖已有配置前存 `.bak`）：
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/brilliantrough/dot_file/master/linux-setup.sh)"
 ```
 
-脚本做的事（**仅面向 Debian/Ubuntu 系,apt**；交互确认 + 幂等；配置覆盖前存 `.bak`）：
+## 关于
+
+此仓库用来存储 Linux 系统中的一些配置文件，通常这些配置文件都是以点开头的隐藏文件。用于在新系统/服务器上快速迁移复原。
+
+## 脚本做的事
 
 询问默认：装缺的软件/插件、部署配置 → `[Y/n]`（回车即装）；覆盖已有配置、配置免密 sudo、无代理或仍是默认源下继续 → `[y/N]`。
 
