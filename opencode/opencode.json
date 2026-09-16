@@ -213,7 +213,7 @@
       }
     },
     "general": {
-      "model": "codex-newapi/gpt-5.6-luna",
+      "model": "anthropic-newapi/deepseek-flash",
       "tools": {
         "read": true,
         "grep": true,
