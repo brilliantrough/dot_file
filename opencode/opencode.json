@@ -203,7 +203,7 @@
   },
   "agent": {
     "explore": {
-      "model": "anthropic-newapi/deepseek-v4-flash",
+      "model": "anthropic-newapi/deepseek-flash",
       "tools": {
         "read": true,
         "grep": true,
