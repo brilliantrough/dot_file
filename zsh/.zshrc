@@ -125,6 +125,9 @@ fi
 autoload -Uz compinit
 compinit -u
 
+# ~/.local/bin(user 级二进制:lvim、codegraph、pip --user 装的东西)
+export PATH="$HOME/.local/bin:$PATH"
+
 # opencode
 export PATH=$HOME/.opencode/bin:$PATH
 

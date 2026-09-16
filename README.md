@@ -8,34 +8,43 @@
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/brilliantrough/dot_file/master/linux-setup.sh)"
 ```
 
-安装 zsh、oh-my-zsh(含语法高亮/自动建议插件)、tmux,并部署 zsh 与 tmux 配置文件。国内网络建议先 `export http_proxy/https_proxy`。
+脚本做的事（交互确认 + 幂等；配置覆盖前存 `.bak`）：
+
+| 步骤 | 内容 |
+|---|---|
+| 0 | 代理提醒；提权检查（root 直接用；普通用户可选一键配置 sudo 免密）；apt 源检查（仍是官方源则提示换清华/南大镜像） |
+| 1 | 系统包：`zsh tmux git wget`（必需）+ `vim neovim autojump make python3-pip ca-certificates`（可选） |
+| 1.5 | 用户级运行时：`uv`（+ Python 3.9~3.13）、`fnm`（+Node LTS）、`bun`。提前装好，agent-skills 的 `opencode-setup.sh` 即可直接通过 |
+| 2-3 | oh-my-zsh（`--unattended`，切默认 shell）+ 插件 zsh-syntax-highlighting / zsh-autosuggestions |
+| 4 | 部署 `~/.zshrc` `~/.aliases` `~/.func` `~/.tmux.conf` `~/.tmux.conf.local` `~/.condarc` |
+| 5 | tmux 插件管理器 tpm（+ 按 `.tmux.conf` 安装插件） |
+| 6 | ripgrep：有 sudo 走 apt，否则从 GitHub 下 musl 二进制到 `~/.local/bin` |
+| 7 | mihomo：按架构下二进制到 `~/.local/bin`（不做全局安装） |
+| 8 | LunarVim（需 nvim>=0.9）+ 部署 lvim 配置到 `~/.config/lvim` |
+
+无 sudo 时跳过「装软件」的步骤（1 的 apt 安装、8 的 LunarVim），但第 4/5 步与 6/7 的二进制下载只动用户目录，照常执行。国内网络建议先 `export http_proxy/https_proxy`。
 
 ## tmux
 
-`.tmux.conf` 和 `.tmux.conf.local` 文件
+`.tmux.conf` 和 `.tmux.conf.local`，并由脚本安装 tpm 与其中声明的插件。
 
 ## neovim
 
-`init.vim` 和 `coc-settings.json` 文件
+`init.vim` 和 `coc-settings.json`（vim-plug + coc 的旧配置，仅存档；脚本不部署——现在主要用 lvim）。
 
 ## lvim
 
-LunarVim 配置文件，放在 `~/.config/lvim/` 目录下。
+LunarVim 配置（部署到 `~/.config/lvim/`）。脚本第 8 步会安装 LunarVim（`release-1.4/neovim-0.9`）并部署这些文件；若系统 nvim < 0.9 会跳过安装，但仍部署配置。
 
-如果已经安装好 LunarVim，可在仓库根目录执行：
+手动部署：
 
 ```bash
-mkdir -p ~/.config/lvim
-cp -r lvim/* ~/.config/lvim/
+mkdir -p ~/.config/lvim && cp -r lvim/* ~/.config/lvim/
 ```
 
-## squid
+## python
 
-`/etc/squid/squid.conf` 文件
-
-## proxychains
-
-`/etc/proxychains.conf` 文件
+`.condarc` → `~/.condarc`（清华源），由脚本部署。
 
 ## zsh
 
@@ -51,6 +60,10 @@ cp -r lvim/* ~/.config/lvim/
 
 敏感信息(key、网关地址)一律以 `<YOUR_*>` 占位符入库,部署时替换。
 
-## python
+## squid
 
-`.condarc` 文件
+`/etc/squid/squid.conf` 文件（已停用,仅存档）
+
+## proxychains
+
+`/etc/proxychains.conf` 文件（已停用,仅存档）
