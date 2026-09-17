@@ -1,7 +1,14 @@
 {
   "mcpServers": {
     "mcphub-web": {
-      "url": "https://<YOUR_MCPHUB_HOST>/mcp/web"
+      "url": "https://<YOUR_MCPHUB_HOST>/mcp/web",
+      "directTools": [
+        "firecrawl-mcp-firecrawl_scrape",
+        "firecrawl-mcp-firecrawl_search",
+        "tavily-mcp-tavily_search",
+        "tavily-mcp-tavily_extract",
+        "firecrawl-mcp-firecrawl_research_search_github"
+      ]
     },
     "codegraph": {
       "command": "<CODEGRAPH_BIN>",
