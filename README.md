@@ -63,7 +63,9 @@ mkdir -p ~/.config/lvim && cp -r lvim/* ~/.config/lvim/
 
 `opencode/magic-context.jsonc` → `~/.config/cortexkit/magic-context.jsonc`
 
-`konsole/csi-u.keytab` → `~/.local/share/konsole/csi-u.keytab`(把 Shift/Ctrl+Enter 编成 kitty CSI-u,应用才能和普通回车区分开;装完需在 Konsole 里 Settings → Edit Current Profile → Keyboard 选 `CSI-u …`,再重启 tmux)。`tmux/.tmux.conf` 里的 `set -g extended-keys always` 负责把扩展键透传给应用,两者缺一不可。
+`konsole/csi-u.keytab` → `~/.local/share/konsole/csi-u.keytab`(把 Shift/Ctrl+Enter 编成 kitty CSI-u,应用才能和普通回车区分开;装完需在 Konsole 里 Settings → Edit Current Profile → Keyboard 选 `CSI-u …`,再重启 tmux)。`tmux/.tmux.conf` 里的 `set -g extended-keys always` + `set -as terminal-features 'xterm*:extkeys'` 负责把扩展键透传给应用,两者缺一不可。
+
+> 只想要 Shift+Enter 换行的话有更轻的做法:Konsole 里 Settings → Configure Konsole → Profiles → 编辑 `\EOM` 映射改成 `\n`(网上常见方案),不用碰 tmux;但发不出 Ctrl+Enter。
 
 `pi/keybindings.json` → `~/.pi/agent/keybindings.json`(Enter/Shift+Enter 换行、Ctrl+Enter/Alt+Enter 发送)
 
