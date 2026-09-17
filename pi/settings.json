@@ -16,5 +16,6 @@
     "find",
     "ls"
   ],
+  "theme": "one-dark",
   "enableInstallTelemetry": false
 }
