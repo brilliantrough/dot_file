@@ -1,0 +1,9 @@
+{
+  "defaultProvider": "anthropic-newapi",
+  "defaultModel": "deepseek-flash",
+  "defaultThinkingLevel": "high",
+  "enabledModels": ["anthropic-newapi/*", "claude-newapi/*", "codex-newapi/*"],
+  "defaultTools": ["read", "bash", "edit", "write", "grep", "find", "ls"],
+  "compaction": { "enabled": false },
+  "enableInstallTelemetry": false
+}

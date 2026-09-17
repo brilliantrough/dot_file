@@ -19,10 +19,17 @@
   "historian": {
     "opencode": {
       "model": "anthropic-newapi/deepseek-flash"
+    },
+    "pi": {
+      "model": "anthropic-newapi/deepseek-flash",
+      "thinking_level": "medium"
     }
   },
   "dreamer": {
     "opencode": {
+      "model": "anthropic-newapi/deepseek-flash"
+    },
+    "pi": {
       "model": "anthropic-newapi/deepseek-flash"
     }
   },

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "mcphub-web": {
+      "url": "https://<YOUR_MCPHUB_HOST>/mcp/web"
+    },
+    "codegraph": {
+      "command": "<CODEGRAPH_BIN>",
+      "args": ["serve", "--mcp"]
+    },
+    "claude-mem": {
+      "command": "<BUN_BIN>",
+      "args": ["<MCP_CJS>"]
+    }
+  }
+}
