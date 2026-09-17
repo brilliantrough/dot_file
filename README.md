@@ -63,6 +63,8 @@ mkdir -p ~/.config/lvim && cp -r lvim/* ~/.config/lvim/
 
 `opencode/magic-context.jsonc` → `~/.config/cortexkit/magic-context.jsonc`
 
+`opencode/tui-plugins/later/` → `~/.config/opencode/tui-plugins/later/`(延迟发送 prompt 的 TUI 插件;由 agent-skills 的 `opencode-setup.sh` 第 5.3 步部署并往 `~/.config/opencode/tui.jsonc` 补 `./tui-plugins/later` 条目)
+
 敏感信息(key、网关地址)一律以 `<YOUR_*>` 占位符入库,部署时替换。
 
 ## docker
