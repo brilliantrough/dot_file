@@ -17,5 +17,6 @@
     "ls"
   ],
   "theme": "one-dark",
+  "hideThinkingBlock": true,
   "enableInstallTelemetry": false
 }
