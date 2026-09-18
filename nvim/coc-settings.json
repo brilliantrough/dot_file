@@ -248,7 +248,7 @@
         },
 
         "latex": {
-            "command": "/home/pzy000/widget/texlab/texlab",
+            "command": "texlab",
             "filetypes": ["tex", "bib", "plaintex", "context"]
         }
     },

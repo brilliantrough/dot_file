@@ -1,6 +1,6 @@
 # LunarVim 快捷键速查
 
-这份文档基于当前目录 `/home/pzy000/.config/lvim` 的实际配置整理。
+这份文档基于当前目录 `~/.config/lvim` 的实际配置整理。
 
 - 当前 `leader` 键是 `Space`
 - 当前系统中没有单独的用户级 `~/.config/nvim` 配置目录

@@ -452,7 +452,7 @@ let g:vimtex_compiler_latexmk_engines = {
 " clang-format
 " function! Formatonsave()
 "   let l:formatdiff = 1
-"     pyf /home/pzy000/llvm/tools/clang/tools/clang-format/clang-format.py
+"     pyf ~/llvm/tools/clang/tools/clang-format/clang-format.py
 " endfunction
 " autocmd BufWritePre *.h,*.cc,*.c,*.cpp call Formatonsave()
 
