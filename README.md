@@ -59,7 +59,7 @@ mkdir -p ~/.config/lvim && cp -r lvim/* ~/.config/lvim/
 
 `opencode/opencode.json` → `~/.config/opencode/opencode.json`（脚本每次运行按模板覆盖各 provider 的 models,apiKey 等本地字段保留）
 
-`opencode/claude-mem.settings.json` → `~/.claude-mem/settings.json`（`CLAUDE_MEM_PROVIDER=openrouter` 走的是 **OpenAI 协议**：`POST <BASE_URL>/chat/completions` + `Authorization: Bearer <key>`，不是 Anthropic 的 `/v1/messages` + `x-api-key`。所以 `CLAUDE_MEM_OPENROUTER_API_KEY` 要填 **OpenAI 协议**的 key，`CLAUDE_MEM_OPENROUTER_BASE_URL` 填 OpenAI 兼容网关地址）
+`opencode/claude-mem.settings.json` → `~/.claude-mem/settings.json`（`CLAUDE_MEM_PROVIDER=openrouter` 走的是 **OpenAI 协议**：`POST <BASE_URL>/chat/completions` + `Authorization: Bearer <key>`，不是 Anthropic 的 `/v1/messages` + `x-api-key`。所以 `CLAUDE_MEM_OPENROUTER_API_KEY` 要填 **OpenAI 协议**的 key，`CLAUDE_MEM_OPENROUTER_BASE_URL` 填 OpenAI 兼容网关地址。`CLAUDE_MEM_PROVIDER` 必须是 `openrouter`：一键脚本会强制纠正成这个值（模型/接口/key 不碰），安装器临时写入的 `claude` 会被恢复。`CLAUDE_MEM_LLM_TIMEOUT_MS=120000` 是每 attempt 上限（默认 30000ms，允许 500–300000），因为非流式请求要等整段生成完，慢模型很容易撞上 30s 而被判超时）
 
 `opencode/magic-context.jsonc` → `~/.config/cortexkit/magic-context.jsonc`
 
