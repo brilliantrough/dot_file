@@ -20,6 +20,10 @@
       "visible": true
     },
     {
+      "id": "agent-skills:packages",
+      "visible": true
+    },
+    {
       "id": "activity",
       "visible": true
     },
