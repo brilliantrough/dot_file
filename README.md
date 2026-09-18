@@ -72,6 +72,14 @@ mkdir -p ~/.config/lvim && cp -r lvim/* ~/.config/lvim/
 `opencode/tui-plugins/later/` → `~/.config/opencode/tui-plugins/later/`(延迟发送 prompt 的 TUI 插件;由 agent-skills 的 `opencode-setup.sh` 第 5.3 步部署并往 `~/.config/opencode/tui.jsonc` 补 `./tui-plugins/later` 条目)
 敏感信息(key、网关地址)一律以 `<YOUR_*>` 占位符入库,部署时替换。
 
+## pi
+
+由 agent-skills 的 `pi-setup.sh` 部署,不要整目录覆盖本机配置：
+
+- `pi/settings.json`：GPT Astra/Sol 的模型级 thinking 默认 `xhigh`,其他沿用 `high`；agent 级重试最多 3 次,按 4/8/16 秒等待,不额外启用 provider 重试。
+- `pi/pi-autoname.json`：配合 `pi-autoname@0.6.8`,使用现有 `codex-newapi/gpt-5.6-sol` 命名；重命名冷却 1440 分钟,保留手工会话名。会额外调用模型,失败还可能尝试当前会话模型；上游固定读 `~/.pi/agent`,不支持自定义 agent 目录。
+- 任务结束时间/耗时由 agent-skills Pi 包的 `message-timing.ts` 提供,不是 dot_file 中的散装扩展；只在任务稳定结束时追加记录,不进入模型上下文。
+
 ## docker
 
 `docker/Dockerfile` —— 在项目方 base 镜像上叠加「系统级」软件：apt 包（zsh/tmux/git/openssh/neovim/autojump/ripgrep/python3…）+ `uv`/`fnm`/`bun`/`mihomo` 装到 `/usr/local`，并用 `uv` 预装 Python 3.9~3.13。

@@ -1,6 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/cortexkit/magic-context/master/assets/magic-context.schema.json",
   "enabled": true,
+  // Pi 侧栏负责实时任务列表；保留 todowrite 和 /todos，仅关闭重复 widget。
+  "todowrite": { "overlay": false },
   "cache_ttl": "5m",
   "temporal_awareness": true,
   "toast_duration_ms": 5000,

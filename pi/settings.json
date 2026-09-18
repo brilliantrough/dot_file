@@ -2,6 +2,15 @@
   "defaultProvider": "anthropic-newapi",
   "defaultModel": "deepseek-flash",
   "defaultThinkingLevel": "high",
+  "modelThinkingLevels": {
+    "codex-newapi/gpt-6-astra": "xhigh",
+    "codex-newapi/gpt-5.6-sol": "xhigh"
+  },
+  "retry": {
+    "enabled": true,
+    "maxRetries": 3,
+    "baseDelayMs": 4000
+  },
   "enabledModels": [
     "anthropic-newapi/*",
     "claude-newapi/*",
