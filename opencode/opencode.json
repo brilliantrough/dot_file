@@ -226,7 +226,7 @@
   "mcp": {
     "mcphub-web": {
       "type": "remote",
-      "url": "https://mcp.pezayo.com/mcp/web"
+      "url": "https://<YOUR_MCPHUB_HOST>/mcp/web"
     }
   },
   "snapshot": false,

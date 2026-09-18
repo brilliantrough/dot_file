@@ -27,5 +27,6 @@
   ],
   "theme": "one-dark",
   "hideThinkingBlock": true,
+  "tuiMode": "fullscreen",
   "enableInstallTelemetry": false
 }
