@@ -74,10 +74,10 @@ plugins=(git autojump zsh-autosuggestions zsh-syntax-highlighting tmux shell-pro
 
 source $ZSH/oh-my-zsh.sh
 
-# Ctrl+O / Ctrl+U:逐字符接受 zsh-autosuggestions 的灰色补全
+# Ctrl+O / Ctrl+U:接受 zsh-autosuggestions 的灰色补全(^O 逐字符、^U 逐词)
 # (行尾且有建议时即部分接受;^W 保持 zsh 默认 backward-kill-word,免得在没这份配置的机器上手感不一致)
 bindkey '^O' forward-char
-bindkey '^U' forward-char
+bindkey '^U' forward-word
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
