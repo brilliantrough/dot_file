@@ -8,7 +8,7 @@
   },
   "retry": {
     "enabled": true,
-    "maxRetries": 3,
+    "maxRetries": 8,
     "baseDelayMs": 4000
   },
   "enabledModels": [
