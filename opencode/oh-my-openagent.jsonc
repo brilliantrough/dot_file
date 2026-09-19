@@ -40,38 +40,38 @@
 
   "agents": {
     "build": {
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
       "variant": "xhigh"
     },
     "plan": {
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
     },
     "sisyphus": {
-      "model": "codex-newapi/gpt-5.4",
+      "model": "codex-newapi/gpt-5.6-sol",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
       "variant": "xhigh"
     },
     "hephaestus": {
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
       "allow_non_gpt_model": false
     },
     "prometheus": {
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
     },
     "metis": {
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
     },
     "momus": {
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
     },
     "oracle": {
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
     },
     "explore": {
@@ -79,11 +79,11 @@
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
     },
     "librarian": {
-      "model": "anthropic-newapi/mimo-latest",
+      "model": "anthropic-newapi/deepseek-flash",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
     },
     "atlas": {
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "fallback_models": ["anthropic-newapi/kimi-latest", "anthropic-newapi/glm-latest", "anthropic-newapi/minimax-latest"],
     }
   },
@@ -99,7 +99,7 @@
     // 视觉工程类别
     "visual-engineering": {
       "description": "UI/UX development, frontend, design systems",
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       // fallback_models: [],
       // variant: "stable",
       // temperature: 0.7,
@@ -118,7 +118,7 @@
     // 深度分析类别
     "deep": {
       "description": "Deep analysis, research, architectural decisions",
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "variant": "xhigh"
     },
   
@@ -131,19 +131,19 @@
     // 艺术创作类别
     "artistry": {
       "description": "Creative writing, content generation",
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
     },
   
     // 写作类别
     "writing": {
       "description": "Writing and editing tasks",
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
     },
   
     // Ultra Brain - 复杂推理
     "ultrabrain": {
       "description": "Complex reasoning and problem solving",
-      "model": "codex-newapi/gpt-5.5",
+      "model": "codex-newapi/gpt-5.6-sol",
       "variant": "xhigh"
     }
   },
