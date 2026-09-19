@@ -99,7 +99,8 @@ export default {
       });
     api.slots.register({ order: 1000, slots: { session_prompt: render("session"), home_prompt: render("home") } });
 
-    const isEnter = (e) => e && (e.name === "enter" || e.name === "return" || e.sequence === "\r" || e.sequence === "\n");
+    const isEnter = (e) => e && !e.ctrl && !e.shift && !e.meta && !e.super && !e.hyper &&
+      (e.name === "enter" || e.name === "return" || e.sequence === "\r");
     api.keymap.intercept(
       "key",
       (ctx) => {

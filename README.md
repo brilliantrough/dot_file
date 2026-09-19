@@ -63,11 +63,9 @@ mkdir -p ~/.config/lvim && cp -r lvim/* ~/.config/lvim/
 
 `opencode/magic-context.jsonc` → `~/.config/cortexkit/magic-context.jsonc`
 
-`konsole/csi-u.keytab` → `~/.local/share/konsole/csi-u.keytab`(把 Shift/Ctrl+Enter 编成 kitty CSI-u,应用才能和普通回车区分开;装完需在 Konsole 里 Settings → Edit Current Profile → Keyboard 选 `CSI-u …`,再重启 tmux)。`tmux/.tmux.conf` 里的 `set -g extended-keys always` + `set -as terminal-features 'xterm*:extkeys'` 负责把扩展键透传给应用,两者缺一不可。
+按键只在 Pi/OpenCode 应用配置：Enter 发送、Shift+Enter 换行、不绑定 Ctrl+Enter；不自动调整 Konsole/tmux/VS Code。终端必须能区分 Shift+Enter 与普通 Enter；物理 Ctrl+Enter 若被编码成普通 Enter/LF，应用无法单独禁用该物理键。
 
-> 只想要 Shift+Enter 换行的话有更轻的做法:Konsole 里 Settings → Configure Konsole → Profiles → 编辑 `\EOM` 映射改成 `\n`(网上常见方案),不用碰 tmux;但发不出 Ctrl+Enter。
-
-`pi/keybindings.json` → `~/.pi/agent/keybindings.json`(Enter/Shift+Enter 换行、Ctrl+Enter/Ctrl+J 发送,含 `app.*` 自定义键);`pi/agent-skills-ui.json` → `~/.pi/agent/agent-skills-ui.json`(侧栏布局/面板、`clearSelectionOnRelease`)、`pi/agent-skills-editor.json` → `~/.pi/agent/agent-skills-editor.json`(编辑器/页脚视觉)——这三个由 pi-setup.sh 整文件覆盖,有差异先存 `.bak`
+`pi/keybindings.json` → `~/.pi/agent/keybindings.json`(Enter 发送、Shift+Enter 换行,含 `app.*` 自定义键);`pi/agent-skills-ui.json` → `~/.pi/agent/agent-skills-ui.json`(侧栏布局/面板、`clearSelectionOnRelease`)、`pi/agent-skills-editor.json` → `~/.pi/agent/agent-skills-editor.json`(编辑器/页脚视觉)——这三个由 pi-setup.sh 整文件覆盖,有差异先存 `.bak`
 
 `opencode/tui-plugins/later/` → `~/.config/opencode/tui-plugins/later/`(延迟发送 prompt 的 TUI 插件;由 agent-skills 的 `opencode-setup.sh` 第 5.3 步部署并往 `~/.config/opencode/tui.jsonc` 补 `./tui-plugins/later` 条目)
 敏感信息(key、网关地址)一律以 `<YOUR_*>` 占位符入库,部署时替换。
