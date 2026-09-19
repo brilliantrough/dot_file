@@ -125,8 +125,17 @@ fi
 autoload -Uz compinit
 compinit -u
 
-# ~/.local/bin(user 级二进制:lvim、codegraph、pip --user 装的东西)
+# >>> dot_file PATH >>>
+# ~/.local/bin(user 级二进制:uv、lvim、codegraph、rg/mihomo、pip --user 装的东西)
 export PATH="$HOME/.local/bin:$PATH"
+
+# 其他用户级运行时:装了才加(靠后的优先;pi 自带 node,故排在 fnm 之后)
+[ -d "$HOME/.local/share/pnpm" ] && export PNPM_HOME="$HOME/.local/share/pnpm"
+for _d in "$HOME/.local/share/pnpm" "$HOME/.local/share/pi-node/current/bin" "$HOME/.cargo/bin" "$HOME/go/bin"; do
+  [ -d "$_d" ] && export PATH="$_d:$PATH"
+done
+unset _d
+# <<< dot_file PATH <<<
 
 # opencode
 export PATH=$HOME/.opencode/bin:$PATH

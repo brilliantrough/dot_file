@@ -305,6 +305,10 @@ fi
 
 # ---- 4. 配置文件 ----
 fetch zsh/.zshrc "$HOME/.zshrc"
+# 保留本地 .zshrc(上一步选了不覆盖)时提醒:里面没有 dot_file 的 PATH 块,uv/fnm/bun/pi 可能找不到
+if [ -f "$HOME/.zshrc" ] && ! grep -q '>>> dot_file PATH >>>' "$HOME/.zshrc"; then
+  echo "提示: $HOME/.zshrc 不含 dot_file 的 PATH 块——用仓库版本覆盖它,或把块粘进去(uv/fnm/bun/pnpm/pi/cargo/go)"
+fi
 fetch zsh/.aliases "$HOME/.aliases"
 fetch zsh/.func "$HOME/.func"
 fetch tmux/.tmux.conf "$HOME/.tmux.conf"
@@ -444,5 +448,5 @@ echo "== done. 注意事项 =="
 echo "1. ~/.func 含 <YOUR_*> 占位符(已加引号,可直接 source;填真实值后 set_claude_env 才可用)"
 echo "2. exec zsh 或重新登录生效;.zshrc 会自动 source ~/.aliases 和 ~/.func"
 echo "3. opencode 三件套(claude-mem/magic-context/ponytail/notify): 用 brilliantrough/agent-skills 仓库的 opencode-setup.sh"
-echo "4. ripgrep / mihomo / lvim 装在 ~/.local/bin(.zshrc 已加进 PATH);mihomo 首次运行前需自备 config.yaml"
+echo "4. ripgrep / mihomo / lvim / uv 装在 ~/.local/bin,fnm 在 ~/.local/share/fnm,bun 在 ~/.bun(.zshrc 的 dot_file PATH 块已加进 PATH);mihomo 首次运行前需自备 config.yaml"
 echo "5. LunarVim 需 nvim>=0.9;apt 版过旧会跳过,自行装新版 nvim 后重跑即可"
