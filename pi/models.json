@@ -19,7 +19,7 @@
             "cacheWrite": 6.25
           },
           "compat": { "forceAdaptiveThinking": true },
-          "thinkingLevelMap": { "xhigh": "xhigh", "max": "max" }
+          "thinkingLevelMap": { "minimal": null, "medium": null, "xhigh": null, "max": "max" }
         }
       ]
     },
@@ -34,6 +34,7 @@
           "name": "GPT 6 Astra",
           "reasoning": true,
           "input": ["text", "image"],
+          "thinkingLevelMap": { "minimal": null, "low": null, "xhigh": "xhigh", "max": "max" },
           "contextWindow": 500000,
           "maxTokens": 128000,
           "cost": {
@@ -48,6 +49,7 @@
           "name": "GPT 5.6 Sol",
           "reasoning": true,
           "input": ["text", "image"],
+          "thinkingLevelMap": { "minimal": null, "low": null, "xhigh": "xhigh", "max": "max" },
           "contextWindow": 500000,
           "maxTokens": 128000,
           "cost": {
@@ -62,6 +64,7 @@
           "name": "GPT 5.6 Luna",
           "reasoning": true,
           "input": ["text", "image"],
+          "thinkingLevelMap": { "minimal": null, "low": null, "xhigh": "xhigh", "max": "max" },
           "contextWindow": 500000,
           "maxTokens": 128000,
           "cost": {
@@ -82,6 +85,8 @@
           "id": "deepseek-flash",
           "name": "deepseek flash",
           "reasoning": true,
+          "compat": { "forceAdaptiveThinking": true },
+          "thinkingLevelMap": { "minimal": null, "medium": null, "xhigh": null, "max": "max" },
           "contextWindow": 500000,
           "maxTokens": 128000,
           "cost": {
@@ -95,6 +100,8 @@
           "id": "minimax-latest",
           "name": "minimax latest",
           "reasoning": true,
+          "compat": { "forceAdaptiveThinking": true },
+          "thinkingLevelMap": { "minimal": null, "medium": null, "xhigh": null, "max": "max" },
           "contextWindow": 1000000,
           "maxTokens": 100000,
           "cost": {
@@ -108,6 +115,8 @@
           "id": "kimi-latest",
           "name": "kimi latest",
           "reasoning": true,
+          "compat": { "forceAdaptiveThinking": true },
+          "thinkingLevelMap": { "minimal": null, "medium": null, "xhigh": null, "max": "max" },
           "contextWindow": 1000000,
           "maxTokens": 400000,
           "cost": {
