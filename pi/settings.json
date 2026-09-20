@@ -14,7 +14,9 @@
   "enabledModels": [
     "anthropic-newapi/*",
     "claude-newapi/*",
-    "codex-newapi/*"
+    "codex-newapi/*",
+    "zai-coding-cn/*",
+    "kimi-coding/*"
   ],
   "defaultTools": [
     "read",
