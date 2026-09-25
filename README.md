@@ -75,7 +75,7 @@ mkdir -p ~/.config/lvim && cp -r lvim/* ~/.config/lvim/
 由 agent-skills 的 `pi-setup.sh` 部署,不要整目录覆盖本机配置：
 
 - `pi/settings.json`：GPT Astra/Sol 的模型级 thinking 默认 `xhigh`,其他沿用 `high`；agent 级重试最多 3 次,按 4/8/16 秒等待,不额外启用 provider 重试。
-- `pi/pi-autoname.json`：配合 `pi-autoname@0.6.8`,使用现有 `codex-newapi/gpt-5.6-sol` 命名；重命名冷却 1440 分钟,保留手工会话名。会额外调用模型,失败还可能尝试当前会话模型；上游固定读 `~/.pi/agent`,不支持自定义 agent 目录。
+- `pi/pi-autoname.json`：配合 `pi-autoname@0.6.8`,使用现有 `codex-newapi/gpt-6-sol` 命名；重命名冷却 1440 分钟,保留手工会话名。会额外调用模型,失败还可能尝试当前会话模型；上游固定读 `~/.pi/agent`,不支持自定义 agent 目录。
 - 任务结束时间/耗时由 agent-skills Pi 包的 `message-timing.ts` 提供,不是 dot_file 中的散装扩展；只在任务稳定结束时追加记录,不进入模型上下文。
 
 ## docker

@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "model": "codex-newapi/gpt-5.6-sol",
+  "model": "codex-newapi/gpt-6-sol",
   "fallbackModels": [],
   "cooldownMinutes": 1440,
   "respectManualName": true,
