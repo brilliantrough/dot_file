@@ -148,9 +148,9 @@
         "kimi-latest": {
           "name": "kimi latest",
           "limit": {
-            "context": 1000000,
-            "input": 600000,
-            "output": 400000
+            "context": 500000,
+            "input": 372000,
+            "output": 128000
           },
           "variants": {
             "low": {

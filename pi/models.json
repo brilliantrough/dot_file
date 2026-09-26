@@ -117,8 +117,8 @@
           "reasoning": true,
           "compat": { "forceAdaptiveThinking": true },
           "thinkingLevelMap": { "minimal": null, "medium": null, "xhigh": null, "max": "max" },
-          "contextWindow": 1000000,
-          "maxTokens": 400000,
+          "contextWindow": 500000,
+          "maxTokens": 128000,
           "cost": {
             "input": 0.6,
             "output": 3,
