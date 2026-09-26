@@ -5,7 +5,10 @@
 #          无代理或仍是默认源下继续 → [y/N](回车即跳过);非交互环境按各自默认执行
 #
 # 干什么:
-#   0. 代理提醒(大小写的 http(s)_proxy/all_proxy 都查;未设则探测直连,透明代理不拦)
+#   启动时始终配置 HF_ENDPOINT / HF_HUB_DISABLE_XET,不受后续步骤跳过影响
+#   0. mihomo:每次检查程序、配置和数据文件;缺失则设置,本次退出,手动启动并 export 代理后重跑
+#      配置链接可回车跳过,但文件未齐全时不会继续后续安装
+#   0.1 代理提醒(大小写的 http(s)_proxy/all_proxy 都查;未设则探测直连,透明代理不拦)
 #   0.5 提权检查:root 可直接跑;普通用户检测 sudo 免密,可选一键写入 /etc/sudoers.d 配置 NOPASSWD
 #   0.6 apt 源检查:仍是官方默认源则提醒换清华/南大镜像(不代改,只给网址)
 #   1. 系统包:zsh tmux git wget(必需)+ vim neovim autojump make python3-pip ca-certificates(可选,缺才装)
@@ -15,11 +18,11 @@
 #   3. omz 插件:zsh-syntax-highlighting、zsh-autosuggestions
 #   4. 配置文件:~/.zshrc ~/.aliases ~/.func ~/.tmux.conf ~/.tmux.conf.local ~/.condarc(清华源)
 #      (.func 含 <YOUR_*> 占位符,装完记得填,见文末清单)
+#   4.1 模型下载:uv 隔离安装 hf/modelscope;准备 /data、缓存、dl 与 bash/zsh 环境(不装训练框架)
 #   5. tmux 插件管理器 tpm(+插件)
 #   6. ripgrep:有 sudo 走 apt,否则 GitHub 二进制到 ~/.local/bin
-#   7. mihomo:按架构下载二进制到 ~/.local/bin(不做全局安装)
-#   8. LunarVim(需 nvim>=0.9)+ 部署 lvim 配置到 ~/.config/lvim
-#      — 6/7/8 是「装软件」:无提权(can_install=0)时跳过;4/5 只动用户目录,始终执行
+#   7. LunarVim(需 nvim>=0.9)+ 部署 lvim 配置到 ~/.config/lvim
+#      — mihomo 只动用户目录,无需提权;LunarVim 无提权(can_install=0)时跳过
 #
 # opencode 三件套请用 brilliantrough/agent-skills 仓库的 opencode-setup.sh。
 
@@ -83,9 +86,128 @@ fetch() {
   rm -f "$tmp"
 }
 
-echo "== linux 环境一键配置(zsh / oh-my-zsh / tmux)=="
+# HF 镜像默认值始终配置,不依赖数据盘或工具安装;已有环境变量保留。
+setup_hf_mirror() {
+  local rc line existed
+  export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
+  export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"
+  for rc in "$HOME/.bashrc" "${ZDOTDIR:-$HOME}/.zshrc"; do
+    mkdir -p -- "$(dirname "$rc")" || return 1
+    if { [ -e "$rc" ] || [ -L "$rc" ]; } && [ ! -f "$rc" ]; then
+      echo "ERROR: $rc 不是有效配置文件,无法写入必需的 HF 镜像变量" >&2
+      return 1
+    fi
+    existed=0
+    [ -f "$rc" ] && existed=1
+    for line in 'export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"' \
+                'export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"'; do
+      if ! grep -Fxq "$line" "$rc" 2>/dev/null; then
+        if [ "$existed" -eq 1 ] && [ ! -e "$rc.bak.hf-mirror" ] && [ ! -L "$rc.bak.hf-mirror" ]; then
+          cp -pL -- "$rc" "$rc.bak.hf-mirror" || return 1
+        fi
+        printf '\n%s\n' "$line" >> "$rc" || return 1
+      fi
+    done
+  done
+}
 
-# ---- 0. 代理提醒 ----
+echo "== linux 环境一键配置(zsh / oh-my-zsh / tmux)=="
+setup_hf_mirror
+
+# ---- 0. mihomo(在代理检查前准备;已有文件跳过,不自动启动) ----
+mkdir -p "$HOME/.local/bin" "$HOME/.config/mihomo"
+export PATH="$HOME/.local/bin:$PATH"
+
+# mihomo_fetch <url> <目标> [.gz] — 缺失才下载;临时目录内完成下载/解压再落盘
+mihomo_fetch() (
+  local url="$1" dest="$2" suffix="${3:-}" tmp file
+  if [ -e "$dest" ] || [ -L "$dest" ]; then
+    echo "已存在,跳过: $dest"
+    return 0
+  fi
+  umask 077
+  tmp="$(mktemp -d "$(dirname "$dest")/.mihomo-download.XXXXXX")"
+  file="$tmp/${dest##*/}"
+  echo "下载: $dest"
+  if dlto "$url" "$file$suffix" && [ -s "$file$suffix" ]; then
+    if [ "$suffix" = .gz ]; then
+      if ! gzip -d "$file.gz" || ! chmod +x "$file"; then
+        echo "WARN: mihomo 解压或授权失败,可重跑脚本" >&2
+        rm -rf "$tmp"
+        return 0
+      fi
+    fi
+    if mv -n "$file" "$dest"; then
+      echo "installed: $dest"
+    else
+      echo "WARN: 写入失败: $dest" >&2
+    fi
+  else
+    echo "WARN: 下载失败: $dest(检查网络或链接是否失效,可重跑脚本)" >&2
+  fi
+  rm -rf "$tmp"
+)
+
+# 程序须可执行,配置及数据文件须非空;只检查文件,不自动启动代理。
+mihomo_ready() {
+  local bin file
+  bin="$(command -v mihomo)" || return 1
+  [ -f "$bin" ] && [ -s "$bin" ] && [ -x "$bin" ] || return 1
+  for file in mihomo.yaml Country.mmdb geoip.dat; do
+    [ -f "$HOME/.config/mihomo/$file" ] && [ -s "$HOME/.config/mihomo/$file" ] || return 1
+  done
+}
+
+mh_setup_needed=0
+mihomo_ready || mh_setup_needed=1
+
+if command -v mihomo >/dev/null 2>&1 || [ -e "$HOME/.local/bin/mihomo" ] || [ -L "$HOME/.local/bin/mihomo" ]; then
+  echo "mihomo 已存在,跳过二进制下载"
+else
+  mh_arch="$(dpkg --print-architecture 2>/dev/null || uname -m)"
+  case "$mh_arch" in
+    arm64|aarch64) mh_url='https://box.nju.edu.cn/seafhttp/f/471e33b95b6c411998be/?op=view' ;;
+    amd64|x86_64)  mh_url='https://box.nju.edu.cn/seafhttp/f/c89f0d5d264542e9aab8/?op=view' ;;
+    *)            mh_url=""; echo "WARN: 未提供 $mh_arch 的 mihomo 二进制,仅支持 arm64/amd64" >&2 ;;
+  esac
+  if [ -n "$mh_url" ]; then
+    mihomo_fetch "$mh_url" "$HOME/.local/bin/mihomo" .gz
+  fi
+fi
+mihomo_fetch 'https://box.nju.edu.cn/seafhttp/f/acf92c8fad9c4a5fbb41/?op=view' "$HOME/.config/mihomo/Country.mmdb"
+mihomo_fetch 'https://box.nju.edu.cn/seafhttp/f/85a69447a51e4ec09819/?op=view' "$HOME/.config/mihomo/geoip.dat"
+
+if [ -e "$HOME/.config/mihomo/mihomo.yaml" ] || [ -L "$HOME/.config/mihomo/mihomo.yaml" ]; then
+  echo "mihomo.yaml 已存在,跳过配置下载"
+else
+  mh_config_url=""
+  printf 'mihomo 配置文件下载链接(回车跳过): ' >&2
+  if { read -r mh_config_url < /dev/tty; } 2>/dev/null && [ -n "$mh_config_url" ]; then
+    case "$mh_config_url" in
+      http://?*|https://?*) mihomo_fetch "$mh_config_url" "$HOME/.config/mihomo/mihomo.yaml" ;;
+      *) echo "WARN: 配置链接须为 http:// 或 https://,跳过配置下载" >&2 ;;
+    esac
+  else
+    echo "跳过 mihomo 配置下载(回车或无交互终端)"
+  fi
+fi
+if ! mihomo_ready; then
+  echo "ERROR: mihomo 尚未配置完整:程序须可执行,mihomo.yaml、Country.mmdb、geoip.dat 须非空。" >&2
+  echo "本次退出,不执行后续安装。请处理上方错误或补齐 ~/.config/mihomo/mihomo.yaml 后重跑。" >&2
+  exit 1
+fi
+if [ "$mh_setup_needed" -eq 1 ]; then
+  echo "mihomo 设置完成。本次到此退出,请先启动代理,再重新运行本脚本。"
+  echo "1. 在另一个终端或 tmux 中启动 mihomo(保持运行):"
+  printf '   "%s" -d "%s" -f "%s"\n' "$(command -v mihomo)" "$HOME/.config/mihomo" "$HOME/.config/mihomo/mihomo.yaml"
+  echo "2. 确认配置的 HTTP 或 mixed 端口是 7890,在运行本脚本的终端执行:"
+  echo '   export http_proxy=http://localhost:7890 && export https_proxy=http://localhost:7890'
+  echo "3. 重新运行 linux-setup.sh,继续后续安装。"
+  exit 0
+fi
+echo "mihomo 程序、配置和数据文件已就绪,继续检查代理。"
+
+# ---- 0.1 代理提醒 ----
 # 大小写都查;无代理环境变量时再探测直连(排除路由器层透明代理的情况)
 proxy="${http_proxy:-${https_proxy:-${all_proxy:-${HTTP_PROXY:-${HTTPS_PROXY:-${ALL_PROXY:-}}}}}}"
 net_ok() {
@@ -242,11 +364,11 @@ if [ -n "${uv_bin:-}" ]; then
   else
     echo "uv 已是最新(${uv_cur:-未知})"
   fi
-  uv_cfg="$HOME/.config/uv/uv.toml"
+  uv_cfg="${XDG_CONFIG_HOME:-$HOME/.config}/uv/uv.toml"
   if grep -q 'pypi.tuna' "$uv_cfg" 2>/dev/null; then
     echo "uv PyPI 镜像已配置(清华),跳过"
-  elif [ -f "$uv_cfg" ]; then
-    echo "跳过 uv 镜像:$uv_cfg 已存在(非本脚本写入),不覆盖"
+  elif [ -e "$uv_cfg" ] || [ -L "$uv_cfg" ]; then
+    echo "跳过 uv 镜像:$uv_cfg 已存在,保留本机配置"
   elif ask "配置 uv 用清华 PyPI 镜像($uv_cfg)?" Y; then
     mkdir -p "$(dirname "$uv_cfg")"
     printf '%s\n' 'index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"' > "$uv_cfg"
@@ -314,6 +436,181 @@ fetch zsh/.func "$HOME/.func"
 fetch tmux/.tmux.conf "$HOME/.tmux.conf"
 fetch tmux/.tmux.conf.local "$HOME/.tmux.conf.local"
 fetch python/.condarc "$HOME/.condarc"
+# 上面的 shell 配置可能被安装器或仓库模板替换,无条件补回镜像变量。
+setup_hf_mirror
+
+# ---- 4.1 模型 / 数据集下载(通用,不修改系统或训练环境里的 Python 包) ----
+install_model_tools() {
+  local package cli
+  if [ -z "${uv_bin:-}" ]; then
+    echo "WARN: 未安装 uv,跳过 hf/modelscope;装好 uv 后重跑" >&2
+    return 0
+  fi
+  export PATH="${UV_TOOL_BIN_DIR:-$HOME/.local/bin}:$PATH"
+  for package in huggingface_hub modelscope-hub; do
+    if [ "$package" = huggingface_hub ]; then cli=hf; else cli=modelscope; fi
+    if command -v "$cli" >/dev/null 2>&1; then
+      echo "$cli 已存在,保留: $(command -v "$cli")"
+    else
+      UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-$HOME/.local/bin}" \
+        "$uv_bin" tool install --python 3.11 --managed-python "$package" \
+        || echo "WARN: $package 安装失败,可重跑;不使用 pip 修改当前环境" >&2
+    fi
+  done
+}
+
+# 只接受与根盘不同的持久文件系统;不分区、不格式化、不修改 fstab。
+model_data_disk() {
+  [ -d "$1" ] || return 1
+  [ "$(stat -Lc %d -- "$1")" != "$(stat -Lc %d /)" ] || return 1
+  case "$(findmnt -n -o FSTYPE -T "$1")" in
+    ''|tmpfs|ramfs|devtmpfs|squashfs|overlay) return 1 ;;
+  esac
+}
+
+setup_model_storage() {
+  local config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/dot_file" env_file model_root candidate dir tmp rc hook sudo_dirs=0
+  env_file="$config_dir/model-env.sh"
+  if [ -e "$env_file" ] || [ -L "$env_file" ]; then
+    [ -f "$env_file" ] || { echo "WARN: $env_file 不是可读取的配置文件" >&2; return 1; }
+    . "$env_file" || return 1
+  fi
+  model_root="${DL_DATA_ROOT:-/data}"
+  case "$model_root" in /*) ;; *) echo "WARN: DL_DATA_ROOT 必须是绝对路径" >&2; return 1 ;; esac
+  if ! model_data_disk "$model_root"; then
+    echo "提醒: $model_root 不存在或不在独立数据盘上,不会把模型写到系统盘。"
+    df -hT -x tmpfs -x devtmpfs || true
+    printf '已挂载大盘的绝对目录(回车跳过数据布局): ' >&2
+    candidate=""
+    if ! { read -r candidate < /dev/tty; } 2>/dev/null || [ -z "$candidate" ]; then return 1; fi
+    case "$candidate" in /*) ;; *) echo "WARN: 必须提供已存在的绝对目录" >&2; return 1 ;; esac
+    if ! model_data_disk "$candidate"; then
+      echo "WARN: $candidate 不是已挂载的持久数据盘目录,未修改磁盘" >&2
+      return 1
+    fi
+    candidate="$(realpath -e -- "$candidate")" || return 1
+    df -hT -- "$candidate"
+    if [ "$model_root" = /data ] && [ ! -e /data ] && [ ! -L /data ] && [ "$can_install" -eq 1 ]; then
+      ask "创建 /data -> $candidate 的软链接?(不修改现有挂载)" || return 1
+      $SUDO ln -sT -- "$candidate" /data || return 1
+    else
+      echo "保留现有 /data 和权限;本次数据目录使用 $candidate"
+      model_root="$candidate"
+    fi
+  fi
+  if [ -f "$env_file" ] && [ "$model_root" != "${DL_DATA_ROOT:-/data}" ]; then
+    echo "WARN: 已有 $env_file 保留;请先把其中 DL_DATA_ROOT 改为 $model_root 后重跑" >&2
+    return 1
+  fi
+  for dir in models datasets hub hub/hf hub/ms hub/uv logs; do
+    dir="$model_root/$dir"
+    if [ ! -e "$dir" ] && [ ! -L "$dir" ]; then
+      if [ -w "$(dirname "$dir")" ]; then
+        mkdir -- "$dir" || return 1
+      elif [ "$can_install" -eq 1 ]; then
+        if [ "$sudo_dirs" -eq 0 ]; then
+          ask "用提权为当前用户创建缺少的数据子目录?(不修改已有目录属主或权限)" || return 1
+          sudo_dirs=1
+        fi
+        $SUDO install -d -m 755 -o "$(id -u)" -g "$(id -g)" -- "$dir" || return 1
+      else
+        echo "WARN: 无权创建 $dir,请管理员准备后重跑" >&2
+        return 1
+      fi
+    fi
+    if [ ! -d "$dir" ] || [ ! -w "$dir" ]; then
+      echo "WARN: $dir 不可写;保留现有权限,请管理员授权后重跑" >&2
+      return 1
+    fi
+  done
+  mkdir -p "$config_dir" "$HOME/.local/bin" || return 1
+  if [ -e "$env_file" ] || [ -L "$env_file" ]; then
+    echo "已有环境配置,保留: $env_file"
+  else
+    tmp="$(mktemp)" || return 1
+    printf '# dot_file 模型下载默认值;已有环境变量优先。\n[ -n "${DL_DATA_ROOT:-}" ] || export DL_DATA_ROOT=%q\n' "$model_root" > "$tmp"
+    cat >> "$tmp" <<'MODEL_ENV'
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
+case ":$PATH:" in *":${UV_TOOL_BIN_DIR:-$HOME/.local/bin}:"*) ;; *) export PATH="${UV_TOOL_BIN_DIR:-$HOME/.local/bin}:$PATH" ;; esac
+export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
+# 保留原 token 位置,不把登录凭据搬到共享数据缓存。
+export HF_TOKEN_PATH="${HF_TOKEN_PATH:-${HF_HOME:-${XDG_CACHE_HOME:-$HOME/.cache}/huggingface}/token}"
+export HF_HOME="${HF_HOME:-$DL_DATA_ROOT/hub/hf}"
+export MODELSCOPE_CACHE="${MODELSCOPE_CACHE:-$DL_DATA_ROOT/hub/ms}"
+export UV_CACHE_DIR="${UV_CACHE_DIR:-$DL_DATA_ROOT/hub/uv}"
+export HF_HUB_DISABLE_XET="${HF_HUB_DISABLE_XET:-1}"
+MODEL_ENV
+    _commit "$tmp" "$env_file" || { rm -f "$tmp"; return 1; }
+    rm -f "$tmp"
+  fi
+  if [ -e "$HOME/.local/bin/dl" ] || [ -L "$HOME/.local/bin/dl" ]; then
+    echo "已有 ~/.local/bin/dl,保留;请确认它使用相同目录约定"
+  else
+    tmp="$(mktemp)" || return 1
+    cat > "$tmp" <<'MODEL_DL'
+#!/usr/bin/env bash
+# dl <hf|ms> <org/repo> [--type model|dataset] [--name NAME]
+set -euo pipefail
+usage() { echo '用法: dl <hf|ms> <org/repo> [--type model|dataset] [--name NAME]'; }
+die() { echo "错误: $*" >&2; exit 1; }
+if [ "${1:-}" = --help ] || [ "${1:-}" = -h ]; then usage; exit 0; fi
+[ $# -ge 2 ] || { usage >&2; exit 1; }
+src="$1"; repo="$2"; shift 2
+case "$src" in hf|ms) ;; *) die '平台只能是 hf 或 ms' ;; esac
+[[ "$repo" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] && [[ "$repo" != -* ]] || die 'repo_id 应为 org/repo'
+type=model; name="${repo//\//__}"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --type|--name)
+      [ $# -ge 2 ] && [ -n "$2" ] || die "$1 缺少参数"
+      if [ "$1" = --type ]; then type="$2"; else name="$2"; fi
+      shift 2 ;;
+    *) die "未知参数: $1" ;;
+  esac
+done
+case "$type" in model|dataset) ;; *) die '--type 只能是 model 或 dataset' ;; esac
+[[ "$name" =~ ^[A-Za-z0-9_.-]+$ ]] && [ "$name" != . ] && [ "$name" != .. ] || die '--name 必须是单个目录名,不能包含路径'
+env_file="${XDG_CONFIG_HOME:-$HOME/.config}/dot_file/model-env.sh"
+[ -f "$env_file" ] || die '请先运行 linux-setup.sh 完成模型存储配置'
+. "$env_file"
+root="${DL_DATA_ROOT:-/data}"
+case "$root" in /*) ;; *) die 'DL_DATA_ROOT 必须是绝对路径' ;; esac
+[ -d "$root" ] && [ "$(stat -Lc %d -- "$root")" != "$(stat -Lc %d /)" ] || die '数据盘未就绪,拒绝向系统盘下载;检查挂载或 DL_DATA_ROOT'
+case "$(findmnt -n -o FSTYPE -T "$root")" in ''|tmpfs|ramfs|devtmpfs|squashfs|overlay) die '数据目录不是持久数据盘' ;; esac
+base="$root/${type}s"
+[ -d "$base" ] && [ -w "$base" ] || die "$base 不存在或不可写,请先完成目录初始化"
+dest="$base/$name"
+if [ "$src" = hf ]; then cli=hf; else cli=modelscope; fi
+command -v "$cli" >/dev/null 2>&1 || die "未安装 $cli,请重跑 linux-setup.sh"
+mkdir -p -- "$dest"
+printf '下载: %s -> %s\n' "$repo" "$dest"
+"$cli" download "$repo" --repo-type "$type" --local-dir "$dest"
+printf '完成: %s\n使用该绝对路径加载模型或数据集。\n' "$dest"
+MODEL_DL
+    _commit "$tmp" "$HOME/.local/bin/dl" || { rm -f "$tmp"; return 1; }
+    chmod +x "$HOME/.local/bin/dl" || { rm -f "$tmp"; return 1; }
+    rm -f "$tmp"
+  fi
+  hook='[ ! -f "${XDG_CONFIG_HOME:-$HOME/.config}/dot_file/model-env.sh" ] || . "${XDG_CONFIG_HOME:-$HOME/.config}/dot_file/model-env.sh"'
+  for rc in "$HOME/.bashrc" "${ZDOTDIR:-$HOME}/.zshrc"; do
+    if [ -L "$rc" ]; then
+      echo "跳过符号链接 $rc;请在其目标文件末尾添加: $hook"
+    elif ! grep -Fxq "$hook" "$rc" 2>/dev/null; then
+      if [ -f "$rc" ] && [ ! -e "$rc.bak.models" ]; then cp -p -- "$rc" "$rc.bak.models" || return 1; fi
+      printf '\n# dot_file 模型下载环境\n%s\n' "$hook" >> "$rc" || return 1
+    fi
+  done
+  export DL_DATA_ROOT="$model_root"
+  . "$env_file" || return 1
+  echo "模型: $model_root/models/<org>__<name>;数据集: $model_root/datasets/<org>__<name>"
+  echo "缓存: HF=${HF_HOME:-未设置};ModelScope=${MODELSCOPE_CACHE:-未设置};uv=${UV_CACHE_DIR:-未设置};日志目录=$model_root/logs"
+  echo "当前终端生效: source \"$env_file\";下载: dl hf org/repo 或 dl ms org/repo --type dataset"
+}
+
+if ask "初始化通用模型下载工具(hf/modelscope)、/data 布局和 dl 命令?" Y; then
+  setup_model_storage || echo "WARN: 数据布局尚未完成;准备好数据盘/权限后重跑,不会自动格式化磁盘" >&2
+  install_model_tools
+fi
 
 # ---- 5. tmux 插件管理器 tpm(用户级,无需 sudo) ----
 if ! command -v tmux >/dev/null 2>&1; then
@@ -369,41 +666,7 @@ if [ "$rg_ok" -eq 0 ]; then
   fi
 fi
 
-# ---- 7. mihomo:按架构下二进制到 ~/.local/bin(不做全局安装) ----
-if command -v mihomo >/dev/null 2>&1 || [ -x "$HOME/.local/bin/mihomo" ]; then
-  echo "mihomo 已存在,跳过"
-else
-  case "$(uname -m)" in
-    x86_64|amd64)  mh_arch=amd64 ;;  # 新 CPU 用 amd64;老 CPU 若 SIGILL 再换 amd64-compatible
-    aarch64|arm64) mh_arch=arm64 ;;
-    armv7l|armv7)  mh_arch=armv7 ;;
-    i386|i686)     mh_arch=386 ;;
-    riscv64)       mh_arch=riscv64 ;;
-    ppc64le)       mh_arch=ppc64le ;;
-    s390x)         mh_arch=s390x ;;
-    *)             mh_arch="" ;;
-  esac
-  if [ -z "$mh_arch" ]; then
-    echo "WARN: 未知架构 $(uname -m),跳过 mihomo"
-  elif ask "下载 mihomo($mh_arch) 到 ~/.local/bin?" Y; then
-    mh_tag="$(curl -fsSLI -o /dev/null -w '%{url_effective}' --connect-timeout 8 -m 30 https://github.com/MetaCubeX/mihomo/releases/latest 2>/dev/null | sed 's#.*/##')"
-    mh_tmp="$(mktemp)"
-    if [ -n "$mh_tag" ] && curl -fsSL --connect-timeout 8 -m 300 -o "$mh_tmp" \
-         "https://github.com/MetaCubeX/mihomo/releases/download/${mh_tag}/mihomo-linux-${mh_arch}-${mh_tag}.gz"; then
-      mkdir -p "$HOME/.local/bin"
-      if gunzip -c "$mh_tmp" > "$HOME/.local/bin/mihomo" && chmod 755 "$HOME/.local/bin/mihomo"; then
-        echo "installed: $HOME/.local/bin/mihomo($mh_tag)"
-      else
-        echo "WARN: mihomo 解压失败"
-      fi
-    else
-      echo "WARN: mihomo 下载失败(检查代理)"
-    fi
-    rm -f "$mh_tmp"
-  fi
-fi
-
-# ---- 8. LunarVim(需 nvim>=0.9;用户级安装,但属「装软件」,无提权则跳过) ----
+# ---- 7. LunarVim(需 nvim>=0.9;用户级安装,但属「装软件」,无提权则跳过) ----
 if [ -x "$HOME/.local/bin/lvim" ]; then
   echo "lvim 已存在,跳过安装"
 elif [ "$can_install" -eq 0 ]; then
@@ -448,5 +711,7 @@ echo "== done. 注意事项 =="
 echo "1. ~/.func 含 <YOUR_*> 占位符(已加引号,可直接 source;填真实值后 set_claude_env 才可用)"
 echo "2. exec zsh 或重新登录生效;.zshrc 会自动 source ~/.aliases 和 ~/.func"
 echo "3. opencode 三件套(claude-mem/magic-context/ponytail/notify): 用 brilliantrough/agent-skills 仓库的 opencode-setup.sh"
-echo "4. ripgrep / mihomo / lvim / uv 装在 ~/.local/bin,fnm 在 ~/.local/share/fnm,bun 在 ~/.bun(.zshrc 的 dot_file PATH 块已加进 PATH);mihomo 首次运行前需自备 config.yaml"
+echo '4. ripgrep / mihomo / lvim / uv 装在 ~/.local/bin,fnm 在 ~/.local/share/fnm,bun 在 ~/.bun(.zshrc 的 dot_file PATH 块已加进 PATH);mihomo 配置为 ~/.config/mihomo/mihomo.yaml,回车跳过者需自行补齐'
 echo "5. LunarVim 需 nvim>=0.9;apt 版过旧会跳过,自行装新版 nvim 后重跑即可"
+echo '6. 模型/数据集默认 /data/{models,datasets}/<org>__<name>;用 dl 下载,项目依赖用 uv venv/uv pip/uv run,不修改系统或硬件平台自带的 Python 环境'
+echo '   私有仓库按需 hf auth login / modelscope login;脚本不索要、不写入 token,不自动下载模型权重'
