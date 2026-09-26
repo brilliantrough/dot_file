@@ -1,7 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": true,
-  "permission": "allow",
+  "permission": {
+    "*": "allow",
+    "webfetch": "deny",
+    "websearch": "deny"
+  },
   "compaction": {
     "auto": false,
     "prune": false
