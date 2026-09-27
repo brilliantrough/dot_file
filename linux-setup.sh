@@ -11,9 +11,9 @@
 #   0.1 代理提醒(大小写的 http(s)_proxy/all_proxy 都查;未设则探测直连,透明代理不拦)
 #   0.5 提权检查:root 可直接跑;普通用户检测 sudo 免密,可选一键写入 /etc/sudoers.d 配置 NOPASSWD
 #   0.6 apt 源检查:仍是官方默认源则提醒换清华/南大镜像(不代改,只给网址)
-#   1. 系统包:zsh tmux git wget(必需)+ vim neovim autojump make python3-pip ca-certificates(可选,缺才装)
+#   1. 系统包:zsh tmux git wget(必需)+ vim neovim autojump make build-essential git-lfs python3-pip ca-certificates(可选,缺才装)
 #   1.5 openssh:缺 sshd 则装 openssh-server 并尝试设为开机自启(部分发行版/镜像默认不装)
-#   1.6 用户级运行时:uv(+Python 3.9~3.13、自升级、清华 PyPI 镜像)、fnm(+Node LTS)、bun(无需 sudo;提前装好,opencode-setup.sh 即可直接通过)
+#   1.6 用户级运行时:uv(+Python 3.9~3.13、自升级、清华 PyPI 镜像)、pip 清华镜像(~/.config/pip/pip.conf;conda 的 ~/.condarc 在步骤 4 部署)、fnm(+Node LTS)、bun(无需 sudo;提前装好,opencode-setup.sh 即可直接通过)
 #   2. oh-my-zsh(--unattended) + 默认 shell 切 zsh
 #   3. omz 插件:zsh-syntax-highlighting、zsh-autosuggestions
 #   4. 配置文件:~/.zshrc ~/.aliases ~/.func ~/.tmux.conf ~/.tmux.conf.local ~/.condarc(清华源)
@@ -285,6 +285,8 @@ command -v vim      >/dev/null 2>&1 || opt="$opt vim"
 command -v nvim     >/dev/null 2>&1 || opt="$opt neovim"
 command -v autojump >/dev/null 2>&1 || opt="$opt autojump"
 command -v make     >/dev/null 2>&1 || opt="$opt make"
+command -v g++     >/dev/null 2>&1 || opt="$opt build-essential"   # aarch64/源码编译需 gcc/g++/ld
+command -v git-lfs >/dev/null 2>&1 || opt="$opt git-lfs"          # 模型权重仓库常用
 command -v pip3     >/dev/null 2>&1 || opt="$opt python3-pip"
 if [ "$can_install" -eq 0 ]; then
   if [ -n "$req$opt" ]; then
@@ -374,6 +376,18 @@ if [ -n "${uv_bin:-}" ]; then
     printf '%s\n' 'index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"' > "$uv_cfg"
     echo "wrote: $uv_cfg"
   fi
+fi
+
+# pip 清华源(与 uv/conda 同三件套;已有配置一律保留——可能含内网源/凭据)
+pip_cfg="${XDG_CONFIG_HOME:-$HOME/.config}/pip/pip.conf"
+if grep -q 'pypi.tuna' "$pip_cfg" 2>/dev/null; then
+  echo "pip 镜像已配置(清华),跳过"
+elif [ -e "$pip_cfg" ] || [ -L "$pip_cfg" ]; then
+  echo "跳过 pip 镜像:$pip_cfg 已存在,保留本机配置"
+elif ask "配置 pip 用清华 PyPI 镜像($pip_cfg)?" Y; then
+  mkdir -p "$(dirname "$pip_cfg")"
+  printf '%s\n' '[global]' 'index-url = https://pypi.tuna.tsinghua.edu.cn/simple' > "$pip_cfg"
+  echo "wrote: $pip_cfg"
 fi
 
 if command -v fnm >/dev/null 2>&1 || [ -x "$HOME/.local/share/fnm/fnm" ]; then
