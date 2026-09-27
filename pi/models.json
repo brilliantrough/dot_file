@@ -127,6 +127,22 @@
           }
         }
       ]
+    },
+    "zai-coding-cn": {
+      "modelOverrides": {
+        "glm-4.6v": { "contextWindow": 500000 },
+        "glm-5.3": { "contextWindow": 500000 },
+        "glm-5.3-flash": { "contextWindow": 500000 },
+        "glm-5.3-highspeed": { "contextWindow": 500000 }
+      }
+    },
+    "kimi-coding": {
+      "modelOverrides": {
+        "k3": { "contextWindow": 500000 },
+        "k3-256k": { "contextWindow": 500000 },
+        "kimi-for-coding": { "contextWindow": 500000 },
+        "kimi-for-coding-highspeed": { "contextWindow": 500000 }
+      }
     }
   }
 }

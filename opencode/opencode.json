@@ -203,6 +203,62 @@
           }
         }
       }
+    },
+    "zhipuai-coding-plan": {
+      "models": {
+        "glm-4.6v": {
+          "limit": {
+            "context": 500000,
+            "output": 32768
+          }
+        },
+        "glm-5.3": {
+          "limit": {
+            "context": 500000,
+            "output": 131072
+          }
+        },
+        "glm-5.3-flash": {
+          "limit": {
+            "context": 500000,
+            "output": 131072
+          }
+        },
+        "glm-5.3-highspeed": {
+          "limit": {
+            "context": 500000,
+            "output": 131072
+          }
+        }
+      }
+    },
+    "kimi-code-plan-cn": {
+      "models": {
+        "k3": {
+          "limit": {
+            "context": 500000,
+            "output": 131072
+          }
+        },
+        "k3-256k": {
+          "limit": {
+            "context": 500000,
+            "output": 131072
+          }
+        },
+        "kimi-for-coding": {
+          "limit": {
+            "context": 500000,
+            "output": 32768
+          }
+        },
+        "kimi-for-coding-highspeed": {
+          "limit": {
+            "context": 500000,
+            "output": 32768
+          }
+        }
+      }
     }
   },
   "agent": {
