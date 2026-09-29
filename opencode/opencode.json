@@ -201,6 +201,36 @@
               "effort": "max"
             }
           }
+        },
+        "grok-4.7": {
+          "name": "Grok 4.7",
+          "limit": {
+            "context": 500000,
+            "input": 372000,
+            "output": 128000
+          },
+          "variants": {
+            "low": {
+              "thinking": {
+                "type": "enabled"
+              },
+              "effort": "low"
+            },
+            "high": {
+              "thinking": {
+                "type": "enabled",
+                "display": "summarized"
+              },
+              "effort": "high"
+            },
+            "max": {
+              "thinking": {
+                "type": "enabled",
+                "display": "summarized"
+              },
+              "effort": "max"
+            }
+          }
         }
       }
     },

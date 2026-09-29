@@ -97,6 +97,21 @@
           }
         },
         {
+          "id": "grok-4.7",
+          "name": "Grok 4.7",
+          "reasoning": true,
+          "compat": { "forceAdaptiveThinking": true },
+          "thinkingLevelMap": { "minimal": null, "medium": null, "xhigh": null, "max": "max" },
+          "contextWindow": 500000,
+          "maxTokens": 128000,
+          "cost": {
+            "input": 0.15,
+            "output": 0.6,
+            "cacheRead": 0.003,
+            "cacheWrite": 0.15
+          }
+        },
+        {
           "id": "minimax-latest",
           "name": "minimax latest",
           "reasoning": true,
