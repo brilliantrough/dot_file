@@ -18,8 +18,8 @@
         "apiKey": "<YOUR_NEWAPI_API_KEY>"
       },
       "models": {
-        "claude-opus-5": {
-          "name": "Claude Opus 5",
+        "claude-opus-5-5": {
+          "name": "Claude Opus 5.5",
           "limit": {
             "context": 1000000,
             "input": 900000,
@@ -76,8 +76,8 @@
             }
           }
         },
-        "gpt-6-sol": {
-          "name": "GPT 6 Sol",
+        "gpt-6.1-sol": {
+          "name": "GPT 6.1 Sol",
           "limit": {
             "context": 500000,
             "input": 372000,

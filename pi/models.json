@@ -6,8 +6,8 @@
       "apiKey": "<YOUR_NEWAPI_API_KEY>",
       "models": [
         {
-          "id": "claude-opus-5",
-          "name": "Claude Opus 5",
+          "id": "claude-opus-5-5",
+          "name": "Claude Opus 5.5",
           "reasoning": true,
           "input": ["text", "image"],
           "contextWindow": 1000000,
@@ -45,8 +45,8 @@
           }
         },
         {
-          "id": "gpt-6-sol",
-          "name": "GPT 6 Sol",
+          "id": "gpt-6.1-sol",
+          "name": "GPT 6.1 Sol",
           "reasoning": true,
           "input": ["text", "image"],
           "thinkingLevelMap": { "minimal": null, "low": null, "xhigh": "xhigh", "max": "max" },
