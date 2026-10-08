@@ -25,7 +25,9 @@
     "write",
     "grep",
     "find",
-    "ls"
+    "ls",
+    "codemode",
+    "tool_search"
   ],
   "theme": "one-dark",
   "hideThinkingBlock": true,
