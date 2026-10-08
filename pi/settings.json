@@ -32,5 +32,6 @@
   "theme": "one-dark",
   "hideThinkingBlock": true,
   "tuiMode": "fullscreen",
+  "fullscreenWheelScrollLines": 3,
   "enableInstallTelemetry": false
 }
