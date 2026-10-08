@@ -23,8 +23,7 @@
       "model": "anthropic-newapi/deepseek-flash"
     },
     "pi": {
-      "model": "anthropic-newapi/deepseek-flash",
-      "thinking_level": "medium"
+      "model": "anthropic-newapi/deepseek-flash"
     }
   },
   "dreamer": {
