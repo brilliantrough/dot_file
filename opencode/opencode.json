@@ -182,21 +182,24 @@
           "variants": {
             "low": {
               "thinking": {
-                "type": "enabled"
+                "type": "enabled",
+                "budgetTokens": 8000
               },
               "effort": "low"
             },
             "high": {
               "thinking": {
                 "type": "enabled",
-                "display": "summarized"
+                "display": "summarized",
+                "budgetTokens": 16000
               },
               "effort": "high"
             },
             "max": {
               "thinking": {
                 "type": "enabled",
-                "display": "summarized"
+                "display": "summarized",
+                "budgetTokens": 32000
               },
               "effort": "max"
             }
@@ -212,21 +215,24 @@
           "variants": {
             "low": {
               "thinking": {
-                "type": "enabled"
+                "type": "enabled",
+                "budgetTokens": 8000
               },
               "effort": "low"
             },
             "high": {
               "thinking": {
                 "type": "enabled",
-                "display": "summarized"
+                "display": "summarized",
+                "budgetTokens": 16000
               },
               "effort": "high"
             },
             "max": {
               "thinking": {
                 "type": "enabled",
-                "display": "summarized"
+                "display": "summarized",
+                "budgetTokens": 32000
               },
               "effort": "max"
             }
