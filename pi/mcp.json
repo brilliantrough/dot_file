@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "mcphub-web": {
+    "web": {
       "url": "https://<YOUR_MCPHUB_HOST>/mcp/web",
       "exposure": "deferred",
       "description": "网页与新闻检索、页面抓取、开发文档和 GitHub 研究；常用工具直连，其余按需发现。",
