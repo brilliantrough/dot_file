@@ -16,12 +16,6 @@
       "args": ["serve", "--mcp"],
       "exposure": "deferred",
       "description": "项目代码知识图谱：符号、引用、调用关系与结构检索。"
-    },
-    "claude-mem": {
-      "command": "<BUN_BIN>",
-      "args": ["<MCP_CJS>"],
-      "exposure": "deferred",
-      "description": "claude-mem 历史观测、会话记录和项目经验检索。"
     }
   }
 }
