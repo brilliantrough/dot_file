@@ -20,18 +20,18 @@
   "prompt_surface": { "default": "full" },
   "historian": {
     "opencode": {
-      "model": "anthropic-newapi/deepseek-flash"
+      "model": "codex-newapi/gpt-6-luna"
     },
     "pi": {
-      "model": "anthropic-newapi/deepseek-flash"
+      "model": "codex-newapi/gpt-6-luna"
     }
   },
   "dreamer": {
     "opencode": {
-      "model": "anthropic-newapi/deepseek-flash"
+      "model": "codex-newapi/gpt-6-luna"
     },
     "pi": {
-      "model": "anthropic-newapi/deepseek-flash"
+      "model": "codex-newapi/gpt-6-luna"
     }
   },
   "memory": {
