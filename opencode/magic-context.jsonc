@@ -1,5 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/cortexkit/magic-context/master/assets/magic-context.schema.json",
+  "language": "zh",
   "enabled": true,
   // Pi 侧栏负责实时任务列表；保留 todowrite 和 /todos，仅关闭重复 widget。
   "todowrite": { "overlay": false },
@@ -8,10 +9,8 @@
   "toast_duration_ms": 5000,
   "execute_threshold_percentage": 65,
   "history_budget_percentage": 0.15,
-  "clear_reasoning_age": 50,
   "historian_timeout_ms": 600000,
   "fail_closed_blocking": true,
-  "smart_drops": false,
   "compaction": { "enabled": true },
   "storage": { "enforce_private_permissions": true },
   "commit_cluster_trigger": { "enabled": true, "min_clusters": 3 },

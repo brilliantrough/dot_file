@@ -1,10 +1,12 @@
 {
   "CLAUDE_MEM_RUNTIME": "worker",
   "CLAUDE_MEM_PROVIDER": "openrouter",
+  "CLAUDE_MEM_MODE": "code--zh",
+  "CLAUDE_MEM_QUOTA_FALLBACK_PROVIDER": "off",
   "CLAUDE_MEM_OPENROUTER_BASE_URL": "https://<YOUR_GATEWAY_HOST>/v1",
   "CLAUDE_MEM_OPENROUTER_MODEL": "mem-1",
   "CLAUDE_MEM_CONTEXT_OBSERVATIONS": "20",
   "CLAUDE_MEM_LLM_TIMEOUT_MS": "120000",
-  "CLAUDE_MEM_SKIP_TOOLS": "ListMcpResourcesTool,SlashCommand,Skill,TodoWrite,AskUserQuestion,todowrite,skill,question,ask_user_question,list,ls,LS,list_mcp_resources,list_mcp_resource_templates,read,Read,bash,Bash,BashOutput,grep,Grep,glob,Glob,find,Find,ctx_*,web_*,codegraph_*,claude-mem_*,claude_mem_*,mcp,mcp__*",
+  "CLAUDE_MEM_SKIP_TOOLS": "ListMcpResourcesTool,SlashCommand,Skill,TodoWrite,AskUserQuestion,question,ask_user_question,list,ls,list_mcp_resources,list_mcp_resource_templates,read,bash,BashOutput,grep,glob,find,mcp,ctx_search,ctx_expand,ctx_reduce,context_rewrite,context_output_read,mem_search,mem_timeline,mem_get_observations,claude_mem_search,claude-mem_mem_search,claude-mem_search,claude-mem_timeline,claude-mem_get_observations",
   "CLAUDE_MEM_OPENROUTER_API_KEY": "<YOUR_API_KEY>"
 }
