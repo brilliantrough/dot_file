@@ -237,6 +237,23 @@
               "effort": "max"
             }
           }
+        },
+        "mem-1": {
+          "name": "mem-1",
+          "limit": {
+            "context": 500000,
+            "input": 372000,
+            "output": 128000
+          },
+          "variants": {
+            "medium": {
+              "thinking": {
+                "type": "enabled",
+                "budgetTokens": 12000
+              },
+              "effort": "medium"
+            }
+          }
         }
       }
     },
