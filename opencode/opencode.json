@@ -258,6 +258,12 @@
                 "budgetTokens": 12000
               },
               "effort": "medium"
+            },
+            "high": {
+              "thinking": {
+                "type": "adaptive"
+              },
+              "effort": "high"
             }
           }
         }

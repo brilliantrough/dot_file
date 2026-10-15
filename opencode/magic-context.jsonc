@@ -19,18 +19,22 @@
   "prompt_surface": { "default": "full" },
   "historian": {
     "opencode": {
-      "model": "codex-newapi/gpt-6-luna"
+      "model": "anthropic-newapi/mem-1",
+      "variant": "high"
     },
     "pi": {
-      "model": "codex-newapi/gpt-6-luna"
+      "model": "anthropic-newapi/mem-1",
+      "thinking_level": "high"
     }
   },
   "dreamer": {
     "opencode": {
-      "model": "codex-newapi/gpt-6-luna"
+      "model": "anthropic-newapi/mem-1",
+      "variant": "high"
     },
     "pi": {
-      "model": "codex-newapi/gpt-6-luna"
+      "model": "anthropic-newapi/mem-1",
+      "thinking_level": "high"
     }
   },
   "memory": {
