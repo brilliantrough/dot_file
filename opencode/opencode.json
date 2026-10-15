@@ -73,6 +73,9 @@
             },
             "xhigh": {
               "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
             }
           }
         },
@@ -98,6 +101,9 @@
             },
             "xhigh": {
               "reasoningEffort": "xhigh"
+            },
+            "max": {
+              "reasoningEffort": "max"
             }
           }
         },
