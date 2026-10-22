@@ -3,7 +3,8 @@
   "language": "zh",
   "enabled": true,
   // Pi 侧栏负责实时任务列表；保留 todowrite 和 /todos，仅关闭重复 widget。
-  "todowrite": { "overlay": false },
+  // enabled 默认是 false —— 不写就根本没有 todowrite 工具和 /todos 命令。
+  "todowrite": { "enabled": true, "overlay": false },
   "cache_ttl": "5m",
   "temporal_awareness": true,
   "toast_duration_ms": 5000,
