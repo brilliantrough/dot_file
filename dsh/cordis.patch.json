@@ -1,0 +1,214 @@
+[
+  {
+    "id": "llm-deepseek",
+    "config": {
+      "baseURL": "<YOUR_ANTHROPIC_NEWAPI_BASE_URL>",
+      "apiKeyEnv": "ANTHROPIC_NEWAPI_API_KEY"
+    }
+  },
+  {
+    "id": "agent-default-model",
+    "config": {
+      "provider": "deepseek-official",
+      "model": "deepseek-flash"
+    }
+  },
+  {
+    "id": "llm-pi-ai",
+    "config": {
+      "providers": {
+        "claude-newapi": {
+          "api": "anthropic-messages",
+          "baseURL": "<YOUR_CLAUDE_NEWAPI_BASE_URL>",
+          "apiKeyEnv": "CLAUDE_NEWAPI_API_KEY",
+          "models": [
+            {
+              "id": "claude-opus-5-5",
+              "name": "Claude Opus 5.5",
+              "contextWindow": 1000000,
+              "maxTokens": 100000,
+              "input": [
+                "text",
+                "image"
+              ],
+              "reasoningEfforts": {
+                "low": "low",
+                "high": "high",
+                "max": "max"
+              },
+              "compat": {
+                "forceAdaptiveThinking": true
+              }
+            }
+          ]
+        },
+        "codex-newapi": {
+          "api": "openai-responses",
+          "baseURL": "<YOUR_CODEX_NEWAPI_BASE_URL>",
+          "apiKeyEnv": "CODEX_NEWAPI_API_KEY",
+          "models": [
+            {
+              "id": "gpt-6-astra",
+              "name": "GPT 6 Astra",
+              "contextWindow": 500000,
+              "maxTokens": 128000,
+              "input": [
+                "text",
+                "image"
+              ],
+              "reasoningEfforts": {
+                "medium": "medium",
+                "high": "high",
+                "xhigh": "xhigh",
+                "max": "max"
+              }
+            },
+            {
+              "id": "gpt-6.1-sol",
+              "name": "GPT 6.1 Sol",
+              "contextWindow": 500000,
+              "maxTokens": 128000,
+              "input": [
+                "text",
+                "image"
+              ],
+              "reasoningEfforts": {
+                "medium": "medium",
+                "high": "high",
+                "xhigh": "xhigh",
+                "max": "max"
+              }
+            },
+            {
+              "id": "gpt-6-luna",
+              "name": "GPT 6 Luna",
+              "contextWindow": 500000,
+              "maxTokens": 128000,
+              "input": [
+                "text",
+                "image"
+              ],
+              "reasoningEfforts": {
+                "medium": "medium",
+                "high": "high",
+                "xhigh": "xhigh",
+                "max": "max"
+              }
+            }
+          ]
+        },
+        "anthropic-newapi": {
+          "api": "anthropic-messages",
+          "baseURL": "<YOUR_ANTHROPIC_NEWAPI_BASE_URL>",
+          "apiKeyEnv": "ANTHROPIC_NEWAPI_API_KEY",
+          "models": [
+            {
+              "id": "deepseek-flash",
+              "name": "deepseek flash",
+              "contextWindow": 500000,
+              "maxTokens": 128000,
+              "reasoningEfforts": {
+                "low": "low",
+                "high": "high",
+                "max": "max"
+              },
+              "compat": {
+                "forceAdaptiveThinking": true
+              }
+            },
+            {
+              "id": "grok-4.7",
+              "name": "Grok 4.7",
+              "contextWindow": 500000,
+              "maxTokens": 128000,
+              "reasoningEfforts": {
+                "low": "low",
+                "high": "high",
+                "max": "max"
+              },
+              "compat": {
+                "forceAdaptiveThinking": true
+              }
+            },
+            {
+              "id": "minimax-latest",
+              "name": "minimax latest",
+              "contextWindow": 1000000,
+              "maxTokens": 100000,
+              "reasoningEfforts": {
+                "low": "low",
+                "high": "high",
+                "max": "max"
+              },
+              "compat": {
+                "forceAdaptiveThinking": true
+              }
+            },
+            {
+              "id": "kimi-latest",
+              "name": "kimi latest",
+              "contextWindow": 500000,
+              "maxTokens": 128000,
+              "reasoningEfforts": {
+                "low": "low",
+                "high": "high",
+                "max": "max"
+              },
+              "compat": {
+                "forceAdaptiveThinking": true
+              }
+            },
+            {
+              "id": "mem-1",
+              "name": "mem-1",
+              "contextWindow": 500000,
+              "maxTokens": 128000,
+              "reasoningEfforts": {
+                "low": "low",
+                "high": "high",
+                "max": "max"
+              },
+              "compat": {
+                "forceAdaptiveThinking": true
+              }
+            }
+          ]
+        },
+        "zai-coding-cn": {
+          "apiKeyEnv": "ZAI_CODING_CN_API_KEY",
+          "modelOverrides": {
+            "glm-4.6v": {
+              "contextWindow": 500000
+            },
+            "glm-5.3": {
+              "contextWindow": 500000
+            },
+            "glm-5.3-flash": {
+              "contextWindow": 500000
+            },
+            "glm-5.3-highspeed": {
+              "contextWindow": 500000
+            }
+          }
+        },
+        "kimi-coding": {
+          "apiKeyEnv": "KIMI_CODING_API_KEY",
+          "modelOverrides": {
+            "k3": {
+              "contextWindow": 500000
+            },
+            "k3-256k": {
+              "contextWindow": 500000
+            },
+            "kimi-for-coding": {
+              "contextWindow": 500000
+            },
+            "kimi-for-coding-highspeed": {
+              "contextWindow": 500000
+            }
+          }
+        }
+      }
+    }
+  }
+]
