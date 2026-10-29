@@ -85,7 +85,7 @@
           "id": "deepseek-flash",
           "name": "deepseek flash",
           "reasoning": true,
-          "compat": { "forceAdaptiveThinking": true },
+          "compat": { "forceAdaptiveThinking": true, "sendSessionAffinityHeaders": true },
           "thinkingLevelMap": { "minimal": null, "medium": null, "xhigh": null, "max": "max" },
           "contextWindow": 500000,
           "maxTokens": 128000,
