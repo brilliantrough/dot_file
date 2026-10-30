@@ -1,19 +1,18 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "autoupdate": false,
-  "permission": {
-    "*": "allow",
-    "webfetch": "deny",
-    "websearch": "deny"
-  },
+  "update": "disable",
+  "permissions": [
+    { "action": "*", "resource": "*", "effect": "allow" },
+    { "action": "webfetch", "resource": "*", "effect": "deny" },
+    { "action": "websearch", "resource": "*", "effect": "deny" }
+  ],
   "compaction": {
-    "auto": false,
-    "prune": false
+    "auto": false
   },
-  "provider": {
+  "providers": {
     "claude-newapi": {
-      "npm": "@ai-sdk/anthropic",
-      "options": {
+      "package": "aisdk:@ai-sdk/anthropic",
+      "settings": {
         "baseURL": "https://<YOUR_GATEWAY_HOST>/v1",
         "apiKey": "<YOUR_NEWAPI_API_KEY>"
       },
@@ -25,30 +24,30 @@
             "input": 372000,
             "output": 128000
           },
-          "variants": {
-            "low": {
+          "variants": [
+            { "id": "low", "settings": {
               "thinking": {
                 "type": "adaptive"
               },
               "effort": "low"
-            },
-            "max": {
+            } },
+            { "id": "max", "settings": {
               "thinking": {
                 "type": "adaptive",
                 "display": "summarized"
               },
               "effort": "max"
-            }
-          }
+            } }
+          ]
         }
       }
     },
     "codex-newapi": {
-      "npm": "@ai-sdk/openai",
-      "options": {
+      "package": "aisdk:@ai-sdk/openai",
+      "compatibility": { "supportsPromptCacheKey": true },
+      "settings": {
         "baseURL": "https://<YOUR_GATEWAY_HOST>/v1",
-        "apiKey": "<YOUR_NEWAPI_API_KEY>",
-        "setCacheKey": true
+        "apiKey": "<YOUR_NEWAPI_API_KEY>"
       },
       "models": {
         "gpt-6-astra": {
@@ -58,26 +57,16 @@
             "input": 372000,
             "output": 128000
           },
-          "options": {
+          "settings": {
             "store": false
           },
-          "variants": {
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "medium": {
-              "reasoningEffort": "medium"
-            },
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "xhigh": {
-              "reasoningEffort": "xhigh"
-            },
-            "max": {
-              "reasoningEffort": "max"
-            }
-          }
+          "variants": [
+            { "id": "low", "settings": { "reasoningEffort": "low" } },
+            { "id": "medium", "settings": { "reasoningEffort": "medium" } },
+            { "id": "high", "settings": { "reasoningEffort": "high" } },
+            { "id": "xhigh", "settings": { "reasoningEffort": "xhigh" } },
+            { "id": "max", "settings": { "reasoningEffort": "max" } }
+          ]
         },
         "gpt-6.1-sol": {
           "name": "GPT 6.1 Sol",
@@ -86,26 +75,16 @@
             "input": 372000,
             "output": 128000
           },
-          "options": {
+          "settings": {
             "store": false
           },
-          "variants": {
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "medium": {
-              "reasoningEffort": "medium"
-            },
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "xhigh": {
-              "reasoningEffort": "xhigh"
-            },
-            "max": {
-              "reasoningEffort": "max"
-            }
-          }
+          "variants": [
+            { "id": "low", "settings": { "reasoningEffort": "low" } },
+            { "id": "medium", "settings": { "reasoningEffort": "medium" } },
+            { "id": "high", "settings": { "reasoningEffort": "high" } },
+            { "id": "xhigh", "settings": { "reasoningEffort": "xhigh" } },
+            { "id": "max", "settings": { "reasoningEffort": "max" } }
+          ]
         },
         "gpt-6-luna": {
           "name": "GPT 6 Luna",
@@ -114,20 +93,18 @@
             "input": 372000,
             "output": 128000
           },
-          "options": {
+          "settings": {
             "store": false
           },
-          "variants": {
-            "max": {
-              "reasoningEffort": "max"
-            }
-          }
+          "variants": [
+            { "id": "max", "settings": { "reasoningEffort": "max" } }
+          ]
         }
       }
     },
     "anthropic-newapi": {
-      "npm": "@ai-sdk/anthropic",
-      "options": {
+      "package": "aisdk:@ai-sdk/anthropic",
+      "settings": {
         "baseURL": "https://<YOUR_GATEWAY_HOST>/v1",
         "apiKey": "<YOUR_NEWAPI_API_KEY>"
       },
@@ -139,21 +116,21 @@
             "input": 900000,
             "output": 100000
           },
-          "variants": {
-            "low": {
+          "variants": [
+            { "id": "low", "settings": {
               "thinking": {
                 "type": "adaptive"
               },
               "effort": "low"
-            },
-            "max": {
+            } },
+            { "id": "max", "settings": {
               "thinking": {
                 "type": "adaptive",
                 "display": "summarized"
               },
               "effort": "max"
-            }
-          }
+            } }
+          ]
         },
         "kimi-latest": {
           "name": "kimi latest",
@@ -162,21 +139,21 @@
             "input": 372000,
             "output": 128000
           },
-          "variants": {
-            "low": {
+          "variants": [
+            { "id": "low", "settings": {
               "thinking": {
                 "type": "adaptive"
               },
               "effort": "low"
-            },
-            "max": {
+            } },
+            { "id": "max", "settings": {
               "thinking": {
                 "type": "adaptive",
                 "display": "summarized"
               },
               "effort": "max"
-            }
-          }
+            } }
+          ]
         },
         "deepseek-flash": {
           "name": "deepseek flash",
@@ -185,31 +162,31 @@
             "input": 372000,
             "output": 128000
           },
-          "variants": {
-            "low": {
+          "variants": [
+            { "id": "low", "settings": {
               "thinking": {
                 "type": "enabled",
                 "budgetTokens": 8000
               },
               "effort": "low"
-            },
-            "high": {
+            } },
+            { "id": "high", "settings": {
               "thinking": {
                 "type": "enabled",
                 "display": "summarized",
                 "budgetTokens": 16000
               },
               "effort": "high"
-            },
-            "max": {
+            } },
+            { "id": "max", "settings": {
               "thinking": {
                 "type": "enabled",
                 "display": "summarized",
                 "budgetTokens": 32000
               },
               "effort": "max"
-            }
-          }
+            } }
+          ]
         },
         "grok-4.7": {
           "name": "Grok 4.7",
@@ -218,31 +195,31 @@
             "input": 372000,
             "output": 128000
           },
-          "variants": {
-            "low": {
+          "variants": [
+            { "id": "low", "settings": {
               "thinking": {
                 "type": "enabled",
                 "budgetTokens": 8000
               },
               "effort": "low"
-            },
-            "high": {
+            } },
+            { "id": "high", "settings": {
               "thinking": {
                 "type": "enabled",
                 "display": "summarized",
                 "budgetTokens": 16000
               },
               "effort": "high"
-            },
-            "max": {
+            } },
+            { "id": "max", "settings": {
               "thinking": {
                 "type": "enabled",
                 "display": "summarized",
                 "budgetTokens": 32000
               },
               "effort": "max"
-            }
-          }
+            } }
+          ]
         },
         "mem-1": {
           "name": "mem-1",
@@ -251,27 +228,27 @@
             "input": 372000,
             "output": 128000
           },
-          "variants": {
-            "medium": {
+          "variants": [
+            { "id": "medium", "settings": {
               "thinking": {
                 "type": "enabled",
                 "budgetTokens": 12000
               },
               "effort": "medium"
-            },
-            "high": {
+            } },
+            { "id": "high", "settings": {
               "thinking": {
                 "type": "adaptive"
               },
               "effort": "high"
-            }
-          }
+            } }
+          ]
         }
       }
     },
     "gemini-newapi": {
-      "npm": "@ai-sdk/google",
-      "options": {
+      "package": "aisdk:@ai-sdk/google",
+      "settings": {
         "baseURL": "https://<YOUR_GATEWAY_HOST>/v1beta",
         "apiKey": "<YOUR_NEWAPI_API_KEY>"
       },
@@ -343,38 +320,33 @@
       }
     }
   },
-  "agent": {
+  "agents": {
     "explore": {
       "model": "anthropic-newapi/deepseek-flash",
-      "tools": {
-        "read": true,
-        "grep": true,
-        "glob": true,
-        "write": false,
-        "edit": false
-      }
+      "permissions": [
+        { "action": "read", "resource": "*", "effect": "allow" },
+        { "action": "grep", "resource": "*", "effect": "allow" },
+        { "action": "glob", "resource": "*", "effect": "allow" },
+        { "action": "edit", "resource": "*", "effect": "deny" }
+      ]
     },
     "general": {
       "model": "anthropic-newapi/deepseek-flash",
-      "tools": {
-        "read": true,
-        "grep": true,
-        "glob": true,
-        "write": true,
-        "edit": true
-      }
+      "permissions": [
+        { "action": "read", "resource": "*", "effect": "allow" },
+        { "action": "grep", "resource": "*", "effect": "allow" },
+        { "action": "glob", "resource": "*", "effect": "allow" },
+        { "action": "edit", "resource": "*", "effect": "allow" }
+      ]
     }
   },
   "mcp": {
-    "web": {
-      "type": "remote",
-      "url": "https://<YOUR_MCPHUB_HOST>/mcp/web"
+    "servers": {
+      "web": {
+        "type": "remote",
+        "url": "https://<YOUR_MCPHUB_HOST>/mcp/web"
+      }
     }
   },
-  "snapshot": false,
-  "plugin": [
-    "@cortexkit/opencode-magic-context@latest",
-    "@dietrichgebert/ponytail",
-    "./plugins/claude-mem-wrapper.js"
-  ]
+  "snapshots": false
 }
