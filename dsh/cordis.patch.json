@@ -25,8 +25,8 @@
             {
               "id": "claude-opus-5-5",
               "name": "Claude Opus 5.5",
-              "contextWindow": 1000000,
-              "maxTokens": 100000,
+              "contextWindow": 500000,
+              "maxTokens": 128000,
               "input": [
                 "text",
                 "image"
@@ -171,6 +171,23 @@
               "compat": {
                 "forceAdaptiveThinking": true
               }
+            }
+          ]
+        },
+        "gemini-newapi": {
+          "api": "google-generative-ai",
+          "baseURL": "<YOUR_GEMINI_NEWAPI_BASE_URL>",
+          "apiKeyEnv": "GEMINI_NEWAPI_API_KEY",
+          "models": [
+            {
+              "id": "gemini-4-argon",
+              "name": "Gemini 4 Argon",
+              "contextWindow": 500000,
+              "maxTokens": 128000,
+              "input": [
+                "text",
+                "image"
+              ]
             }
           ]
         },

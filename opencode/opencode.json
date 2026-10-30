@@ -21,9 +21,9 @@
         "claude-opus-5-5": {
           "name": "Claude Opus 5.5",
           "limit": {
-            "context": 1000000,
-            "input": 900000,
-            "output": 100000
+            "context": 500000,
+            "input": 372000,
+            "output": 128000
           },
           "variants": {
             "low": {
@@ -265,6 +265,23 @@
               },
               "effort": "high"
             }
+          }
+        }
+      }
+    },
+    "gemini-newapi": {
+      "npm": "@ai-sdk/google",
+      "options": {
+        "baseURL": "https://<YOUR_GATEWAY_HOST>/v1beta",
+        "apiKey": "<YOUR_NEWAPI_API_KEY>"
+      },
+      "models": {
+        "gemini-4-argon": {
+          "name": "Gemini 4 Argon",
+          "limit": {
+            "context": 500000,
+            "input": 372000,
+            "output": 128000
           }
         }
       }
