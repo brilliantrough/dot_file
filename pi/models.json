@@ -60,6 +60,21 @@
           }
         },
         {
+          "id": "gpt-6.1-terra",
+          "name": "GPT 6.1 Terra",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "thinkingLevelMap": { "minimal": null, "low": null, "xhigh": "xhigh", "max": "max" },
+          "contextWindow": 500000,
+          "maxTokens": 128000,
+          "cost": {
+            "input": 1,
+            "output": 5,
+            "cacheRead": 0.1,
+            "cacheWrite": 1.25
+          }
+        },
+        {
           "id": "gpt-6-luna",
           "name": "GPT 6 Luna",
           "reasoning": true,
