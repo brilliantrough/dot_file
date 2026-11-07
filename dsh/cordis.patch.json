@@ -245,6 +245,20 @@
     }
   },
   {
+    "id": "tool-consolidation-review",
+    "config": {
+      "provider": "spawn",
+      "toolName": "consolidation_review",
+      "agentPreset": "consolidation-reviewer",
+      "allowedAgentPresets": ["consolidation-reviewer"],
+      "agentOptions": {
+        "provider": "codex-newapi",
+        "model": "gpt-6.1-sol",
+        "reasoningEffort": "max"
+      }
+    }
+  },
+  {
     "id": "agent-skills-reviewer",
     "config": {
       "id": "consolidation-reviewer",
