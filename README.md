@@ -55,28 +55,9 @@ mkdir -p ~/.config/lvim && cp -r lvim/* ~/.config/lvim/
 
 `.zshrc` 保持通用配置;个人函数、别名拆在 `.func` 和 `.aliases`,部署到 `~/.func`、`~/.aliases`,并在 `.zshrc` 中 source。
 
-## opencode
+## Agent 配置（已迁出）
 
-`opencode/opencode.json` → `~/.config/opencode/opencode.json`：仅维护原生 V2 schema；setup 先备份并转换旧字段，再在线拉取模板。各 `providers.<名称>.models` 随模板刷新，已有 provider 的 `settings`、headers、apiKey 等本地字段保留；`--check` 只预览，V1 宿主须先升级。
-
-`opencode/claude-mem.settings.json` → `~/.claude-mem/settings.json`（`CLAUDE_MEM_PROVIDER=openrouter` 走的是 **OpenAI 协议**：`POST <BASE_URL>/chat/completions` + `Authorization: Bearer <key>`，不是 Anthropic 的 `/v1/messages` + `x-api-key`。所以 `CLAUDE_MEM_OPENROUTER_API_KEY` 要填 **OpenAI 协议**的 key，`CLAUDE_MEM_OPENROUTER_BASE_URL` 填 OpenAI 兼容网关地址。`CLAUDE_MEM_PROVIDER` 必须是 `openrouter`：一键脚本会强制纠正成这个值（模型/接口/key 不碰），安装器临时写入的 `claude` 会被恢复。worker 地址由脚本显式写入 settings：`CLAUDE_MEM_WORKER_HOST=127.0.0.1` + `CLAUDE_MEM_WORKER_PORT=37700 + uid%100`（claude-mem 默认本就按 uid 偏移，避免同机多用户端口冲突；显式写只是让它可见）。解析优先级到处一致：env > settings.json > 公式；Pi 桥与 OpenCode wrapper 都按此；已有自定义值不会被合并覆盖。换端口只改这一个键 + 重启 worker/宿主即可：MCP server 与 Pi 桥直接读 settings.json，上游 OpenCode 插件只认 env（wrapper 已在 import 前把 settings 值写进 env），env 到处优先；redis 队列前缀会跟着端口变。`CLAUDE_MEM_LLM_TIMEOUT_MS=120000` 是每 attempt 上限（默认 30000ms，允许 500–300000），因为非流式请求要等整段生成完，慢模型很容易撞上 30s 而被判超时。另：claude-mem 内置默认是 `CLAUDE_MEM_PROVIDER=claude` + `CLAUDE_MEM_CLAUDE_AUTH_METHOD=subscription`（Claude Code OAuth 订阅）＋`CLAUDE_MEM_MODEL=claude-haiku-4-5`，我们这份模板把 provider 改成了 openrouter；`CLAUDE_MEM_CLAUDE_AUTH_METHOD` 只在 `provider=claude` 那条分支里被读（且只允许 subscription/api-key/gateway/cli），所以 `GET /api/health` 里的 `authMethod` 仍显示 Claude OAuth 只是状态回显，不代表它在用订阅。PRO 记忆（`CLAUDE_MEM_PRO_PLAN/TRIAL_*/PRO_MEMORY_*`、cmem.ai）默认全空，未启用）
-
-`opencode/magic-context.jsonc` → `~/.config/cortexkit/magic-context.jsonc`
-
-按键只在 Pi/OpenCode 应用配置：Enter 发送、Shift+Enter 换行、不绑定 Ctrl+Enter；不自动调整 Konsole/tmux/VS Code。终端必须能区分 Shift+Enter 与普通 Enter；物理 Ctrl+Enter 若被编码成普通 Enter/LF，应用无法单独禁用该物理键。
-
-`pi/keybindings.json` → `~/.pi/agent/keybindings.json`(Enter 发送、Shift+Enter 换行,含 `app.*` 自定义键);`pi/agent-skills-ui.json` → `~/.pi/agent/agent-skills-ui.json`(侧栏布局/面板、`clearSelectionOnRelease`)、`pi/agent-skills-editor.json` → `~/.pi/agent/agent-skills-editor.json`(编辑器/页脚视觉)——这三个由 pi-setup.sh 整文件覆盖,有差异先存 `.bak`
-
-`opencode/tui-plugins/later/` → `~/.config/opencode/tui-plugins/later/`(延迟发送 prompt 的 TUI 插件;由 agent-skills 的 `opencode-setup.sh` 第 5.3 步部署并往 `~/.config/opencode/tui.jsonc` 补 `./tui-plugins/later` 条目)
-敏感信息(key、网关地址)一律以 `<YOUR_*>` 占位符入库,部署时替换。
-
-## pi
-
-由 agent-skills 的 `pi-setup.sh` 部署,不要整目录覆盖本机配置：
-
-- `pi/settings.json`：GPT Astra/Sol 的模型级 thinking 默认 `xhigh`,其他沿用 `high`；agent 级重试最多 3 次,按 4/8/16 秒等待,不额外启用 provider 重试。
-- `pi/pi-autoname.json`：配合 `pi-autoname@0.6.8`,使用现有 `codex-newapi/gpt-6.1-sol` 命名；重命名冷却 1440 分钟,保留手工会话名。会额外调用模型,失败还可能尝试当前会话模型；上游固定读 `~/.pi/agent`,不支持自定义 agent 目录。
-- 任务结束时间/耗时由 agent-skills Pi 包的 `message-timing.ts` 提供,不是 dot_file 中的散装扩展；只在任务稳定结束时追加记录,不进入模型上下文。
+Pi、OpenCode、Codex、DSH 的配置模板自 2026-11-18 起随 [agent-skills](https://github.com/brilliantrough/agent-skills) 分发，放在该仓的 `templates/`，由它的 setup 脚本下载并做字段级合并。本仓不再保存这些文件；迁出前的最后版本是提交 `d6a131b`。
 
 ## docker
 
